@@ -28,13 +28,14 @@ class ResponseUtilsTest(unittest.TestCase):
             if not os.path.exists(path):
                 path = burl.replace('file://', '')
             bbody = open(path).read()
-            assert '<base href="%s">' % url in bbody, "<base> tag not added"
+            assert f'<base href="{url}">' in bbody, "<base> tag not added"
             return True
+
         response = HtmlResponse(url, body=body)
         assert open_in_browser(response, _openfunc=browser_open), \
-            "Browser not called"
+                "Browser not called"
         self.assertRaises(TypeError, open_in_browser, Response(url, body=body), \
-            debug=True)
+                debug=True)
 
     def test_get_meta_refresh(self):
         r1 = HtmlResponse("http://www.example.com", body="""

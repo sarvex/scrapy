@@ -117,7 +117,7 @@ class Shell(object):
         self.p("  view(response)    View response in a browser")
 
     def p(self, line=''):
-        print("[s] %s" % line)
+        print(f"[s] {line}")
 
     def _is_relevant(self, value):
         return isinstance(value, self.relevant_classes)

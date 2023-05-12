@@ -77,7 +77,7 @@ class CommandTest(ProjectTest):
         super(CommandTest, self).setUp()
         self.call('startproject', self.project_name)
         self.cwd = join(self.temp_path, self.project_name)
-        self.env['SCRAPY_SETTINGS_MODULE'] = '%s.settings' % self.project_name
+        self.env['SCRAPY_SETTINGS_MODULE'] = f'{self.project_name}.settings'
 
 
 class GenspiderCommandTest(CommandTest):
@@ -91,7 +91,7 @@ class GenspiderCommandTest(CommandTest):
         assert exists(join(self.proj_mod_path, 'spiders', 'test_name.py'))
 
     def test_template(self, tplname='crawl'):
-        args = ['--template=%s' % tplname] if tplname else []
+        args = [f'--template={tplname}'] if tplname else []
         spname = 'test_spider'
         p = self.proc('genspider', spname, 'test.com', *args)
         out = retry_on_eintr(p.stdout.read)
@@ -119,7 +119,9 @@ class GenspiderCommandTest(CommandTest):
 
     def test_same_name_as_project(self):
         self.assertEqual(2, self.call('genspider', self.project_name))
-        assert not exists(join(self.proj_mod_path, 'spiders', '%s.py' % self.project_name))
+        assert not exists(
+            join(self.proj_mod_path, 'spiders', f'{self.project_name}.py')
+        )
 
 
 class MiscCommandsTest(CommandTest):

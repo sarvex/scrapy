@@ -75,15 +75,12 @@ class MediaPipeline(object):
         if self.download_func:
             # this ugly code was left only to support tests. TODO: remove
             dfd = mustbe_deferred(self.download_func, request, info.spider)
-            dfd.addCallbacks(
-                callback=self.media_downloaded, callbackArgs=(request, info),
-                errback=self.media_failed, errbackArgs=(request, info))
         else:
             request.meta['handle_httpstatus_all'] = True
             dfd = self.crawler.engine.download(request, info.spider)
-            dfd.addCallbacks(
-                callback=self.media_downloaded, callbackArgs=(request, info),
-                errback=self.media_failed, errbackArgs=(request, info))
+        dfd.addCallbacks(
+            callback=self.media_downloaded, callbackArgs=(request, info),
+            errback=self.media_failed, errbackArgs=(request, info))
         return dfd
 
     def _cache_result_and_execute_waiters(self, result, fp, info):
@@ -117,7 +114,7 @@ class MediaPipeline(object):
     def item_completed(self, results, item, info):
         """Called per item when all media requests has been processed"""
         if self.LOG_FAILED_RESULTS:
-            msg = '%s found errors proessing %s' % (self.__class__.__name__, item)
+            msg = f'{self.__class__.__name__} found errors proessing {item}'
             for ok, value in results:
                 if not ok:
                     log.err(value, msg, spider=info.spider)

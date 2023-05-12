@@ -13,6 +13,7 @@ Scrapy developers, if you add a setting here remember to:
 
 """
 
+
 import os
 import sys
 from importlib import import_module
@@ -103,11 +104,7 @@ DUPEFILTER_CLASS = 'scrapy.dupefilter.RFPDupeFilter'
 try:
     EDITOR = os.environ['EDITOR']
 except KeyError:
-    if sys.platform == 'win32':
-        EDITOR = '%s -m idlelib.idle'
-    else:
-        EDITOR = 'vi'
-
+    EDITOR = '%s -m idlelib.idle' if sys.platform == 'win32' else 'vi'
 EXTENSIONS = {}
 
 EXTENSIONS_BASE = {
@@ -235,7 +232,9 @@ TEMPLATES_DIR = abspath(join(dirname(__file__), '..', 'templates'))
 
 URLLENGTH_LIMIT = 2083
 
-USER_AGENT = 'Scrapy/%s (+http://scrapy.org)' % import_module('scrapy').__version__
+USER_AGENT = (
+    f"Scrapy/{import_module('scrapy').__version__} (+http://scrapy.org)"
+)
 
 TELNETCONSOLE_ENABLED = 1
 TELNETCONSOLE_PORT = [6023, 6073]

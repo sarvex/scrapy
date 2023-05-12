@@ -62,9 +62,7 @@ class SitemapSpider(Spider):
             return gunzip(response.body)
 
 def regex(x):
-    if isinstance(x, basestring):
-        return re.compile(x)
-    return x
+    return re.compile(x) if isinstance(x, basestring) else x
 
 def iterloc(it, alt=False):
     for d in it:
@@ -72,5 +70,4 @@ def iterloc(it, alt=False):
 
         # Also consider alternate URLs (xhtml:link rel="alternate")
         if alt and 'alternate' in d:
-            for l in d['alternate']:
-                yield l
+            yield from d['alternate']

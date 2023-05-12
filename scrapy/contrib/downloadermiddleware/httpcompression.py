@@ -39,7 +39,7 @@ class HttpCompressionMiddleware(object):
         return response
 
     def _decode(self, body, encoding):
-        if encoding == 'gzip' or encoding == 'x-gzip':
+        if encoding in ['gzip', 'x-gzip']:
             body = gunzip(body)
 
         if encoding == 'deflate':

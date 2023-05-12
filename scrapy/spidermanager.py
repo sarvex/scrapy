@@ -33,7 +33,7 @@ class SpiderManager(object):
         try:
             return self._spiders[spider_name]
         except KeyError:
-            raise KeyError("Spider not found: {}".format(spider_name))
+            raise KeyError(f"Spider not found: {spider_name}")
 
     def find_by_request(self, request):
         return [name for name, cls in six.iteritems(self._spiders)

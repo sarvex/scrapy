@@ -59,7 +59,7 @@ class IRequest(Interface):
         "A L{http_headers.Headers} instance holding all HTTP response "
         "headers to be sent.")
 
-    def getHeader(key):
+    def getHeader(self):
         """
         Get an HTTP request header.
 
@@ -72,7 +72,7 @@ class IRequest(Interface):
         """
 
 
-    def getCookie(key):
+    def getCookie(self):
         """
         Get a cookie that was sent from the network.
         """
@@ -168,7 +168,7 @@ class IRequest(Interface):
         """
 
 
-    def getSession(sessionInterface=None):
+    def getSession(self):
         """
         Look up the session associated with this request or create a new one if
         there is not one.
@@ -214,7 +214,7 @@ class IRequest(Interface):
         """
 
 
-    def write(data):
+    def write(self):
         """
         Write some data to the body of the response to this request.  Response
         headers are written the first time this method is called, after which
@@ -222,7 +222,7 @@ class IRequest(Interface):
         """
 
 
-    def addCookie(k, v, expires=None, domain=None, path=None, max_age=None, comment=None, secure=None):
+    def addCookie(self, v, expires=None, domain=None, path=None, max_age=None, comment=None, secure=None):
         """
         Set an outgoing HTTP cookie.
 
@@ -232,13 +232,13 @@ class IRequest(Interface):
         """
 
 
-    def setResponseCode(code, message=None):
+    def setResponseCode(self, message=None):
         """
         Set the HTTP response code.
         """
 
 
-    def setHeader(k, v):
+    def setHeader(self, v):
         """
         Set an HTTP response header.  Overrides any previously set values for
         this header.
@@ -251,7 +251,7 @@ class IRequest(Interface):
         """
 
 
-    def redirect(url):
+    def redirect(self):
         """
         Utility function that does a redirect.
 
@@ -259,7 +259,7 @@ class IRequest(Interface):
         """
 
 
-    def setLastModified(when):
+    def setLastModified(self):
         """
         Set the C{Last-Modified} time for the response to this request.
 
@@ -281,7 +281,7 @@ class IRequest(Interface):
         """
 
 
-    def setETag(etag):
+    def setETag(self):
         """
         Set an C{entity tag} for the outgoing response.
 
@@ -303,7 +303,7 @@ class IRequest(Interface):
         """
 
 
-    def setHost(host, port, ssl=0):
+    def setHost(self, port, ssl=0):
         """
         Change the host and port the request thinks it's using.
 
@@ -335,7 +335,7 @@ class ICredentialFactory(Interface):
         "this factory is associated.  For example, C{'basic'} or C{'digest'}.")
 
 
-    def getChallenge(request):
+    def getChallenge(self):
         """
         Generate a new challenge to be sent to a client.
 
@@ -349,7 +349,7 @@ class ICredentialFactory(Interface):
         """
 
 
-    def decode(response, request):
+    def decode(self, request):
         """
         Create a credentials object from the given response.
 
@@ -404,7 +404,7 @@ class IBodyProducer(IPushProducer):
         if this is not known in advance.
         """)
 
-    def startProducing(consumer):
+    def startProducing(self):
         """
         Start producing to the given
         L{IConsumer<twisted.internet.interfaces.IConsumer>} provider.
@@ -433,7 +433,7 @@ class IRenderable(Interface):
     L{twisted.web.template} templating system.
     """
 
-    def lookupRenderMethod(name):
+    def lookupRenderMethod(self):
         """
         Look up and return the render method associated with the given name.
 
@@ -447,7 +447,7 @@ class IRenderable(Interface):
         """
 
 
-    def render(request):
+    def render(self):
         """
         Get the document for this L{IRenderable}.
 
@@ -507,7 +507,7 @@ class IResponse(Interface):
         "available in C{headers}.")
 
 
-    def deliverBody(protocol):
+    def deliverBody(self):
         """
         Register an L{IProtocol<twisted.internet.interfaces.IProtocol>} provider
         to receive the response body.
@@ -539,7 +539,7 @@ class _IRequestEncoder(Interface):
     @since: 12.3
     """
 
-    def encode(data):
+    def encode(self):
         """
         Encode the data given and return the result.
 
@@ -569,7 +569,7 @@ class _IRequestEncoderFactory(Interface):
     @since: 12.3
     """
 
-    def encoderForRequest(request):
+    def encoderForRequest(self):
         """
         If applicable, returns a L{_IRequestEncoder} instance which will encode
         the request.

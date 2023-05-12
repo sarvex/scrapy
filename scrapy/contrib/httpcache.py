@@ -51,10 +51,7 @@ class RFC2616Policy(object):
             return False
         cc = self._parse_cachecontrol(request)
         # obey user-agent directive "Cache-Control: no-store"
-        if 'no-store' in cc:
-            return False
-        # Any other is eligible for caching
-        return True
+        return 'no-store' not in cc
 
     def should_cache_response(self, response, request):
         # What is cacheable - http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html#sec14.9.1
@@ -134,22 +131,13 @@ class RFC2616Policy(object):
             return (date - lastmodified) / 10
 
         # This request can be cached indefinitely
-        if response.status in (300, 301, 308):
-            return self.MAXAGE
-
-        # Insufficient information to compute fresshness lifetime
-        return 0
+        return self.MAXAGE if response.status in (300, 301, 308) else 0
 
     def _compute_current_age(self, response, request, now):
-        # Reference nsHttpResponseHead::ComputeCurrentAge
-        # http://dxr.mozilla.org/mozilla-central/source/netwerk/protocol/http/nsHttpResponseHead.cpp#366
-        currentage = 0
         # If Date header is not set we assume it is a fast connection, and
         # clock is in sync with the server
         date = rfc1123_to_epoch(response.headers.get('Date')) or now
-        if now > date:
-            currentage = now - date
-
+        currentage = now - date if now > date else 0
         if 'Age' in response.headers:
             try:
                 age = int(response.headers['Age'])
@@ -169,7 +157,7 @@ class DbmCacheStorage(object):
         self.db = None
 
     def open_spider(self, spider):
-        dbpath = os.path.join(self.cachedir, '%s.db' % spider.name)
+        dbpath = os.path.join(self.cachedir, f'{spider.name}.db')
         self.db = self.dbmodule.open(dbpath, 'c')
 
     def close_spider(self, spider):
@@ -184,8 +172,7 @@ class DbmCacheStorage(object):
         headers = Headers(data['headers'])
         body = data['body']
         respcls = responsetypes.from_args(headers=headers, url=url)
-        response = respcls(url=url, headers=headers, status=status, body=body)
-        return response
+        return respcls(url=url, headers=headers, status=status, body=body)
 
     def store_response(self, spider, request, response):
         key = self._request_key(request)
@@ -195,13 +182,13 @@ class DbmCacheStorage(object):
             'headers': dict(response.headers),
             'body': response.body,
         }
-        self.db['%s_data' % key] = pickle.dumps(data, protocol=2)
-        self.db['%s_time' % key] = str(time())
+        self.db[f'{key}_data'] = pickle.dumps(data, protocol=2)
+        self.db[f'{key}_time'] = str(time())
 
     def _read_data(self, spider, request):
         key = self._request_key(request)
         db = self.db
-        tkey = '%s_time' % key
+        tkey = f'{key}_time'
         if tkey not in db:
             return  # not found
 
@@ -209,7 +196,7 @@ class DbmCacheStorage(object):
         if 0 < self.expiration_secs < time() - float(ts):
             return  # expired
 
-        return pickle.loads(db['%s_data' % key])
+        return pickle.loads(db[f'{key}_data'])
 
     def _request_key(self, request):
         return request_fingerprint(request)
@@ -241,8 +228,7 @@ class FilesystemCacheStorage(object):
         status = metadata['status']
         headers = Headers(headers_raw_to_dict(rawheaders))
         respcls = responsetypes.from_args(headers=headers, url=url)
-        response = respcls(url=url, headers=headers, status=status, body=body)
-        return response
+        return respcls(url=url, headers=headers, status=status, body=body)
 
     def store_response(self, spider, request, response):
         """Store the given response in the cache."""
@@ -271,7 +257,7 @@ class FilesystemCacheStorage(object):
 
     def _get_request_path(self, spider, request):
         key = request_fingerprint(request)
-        return os.path.join(self.cachedir, spider.name, key[0:2], key)
+        return os.path.join(self.cachedir, spider.name, key[:2], key)
 
     def _read_meta(self, spider, request):
         rpath = self._get_request_path(spider, request)
@@ -295,7 +281,7 @@ class LeveldbCacheStorage(object):
         self.db = None
 
     def open_spider(self, spider):
-        dbpath = os.path.join(self.cachedir, '%s.leveldb' % spider.name)
+        dbpath = os.path.join(self.cachedir, f'{spider.name}.leveldb')
         self.db = self._leveldb.LevelDB(dbpath)
 
     def close_spider(self, spider):
@@ -310,8 +296,7 @@ class LeveldbCacheStorage(object):
         headers = Headers(data['headers'])
         body = data['body']
         respcls = responsetypes.from_args(headers=headers, url=url)
-        response = respcls(url=url, headers=headers, status=status, body=body)
-        return response
+        return respcls(url=url, headers=headers, status=status, body=body)
 
     def store_response(self, spider, request, response):
         key = self._request_key(request)
@@ -322,14 +307,14 @@ class LeveldbCacheStorage(object):
             'body': response.body,
         }
         batch = self._leveldb.WriteBatch()
-        batch.Put('%s_data' % key, pickle.dumps(data, protocol=2))
-        batch.Put('%s_time' % key, str(time()))
+        batch.Put(f'{key}_data', pickle.dumps(data, protocol=2))
+        batch.Put(f'{key}_time', str(time()))
         self.db.Write(batch)
 
     def _read_data(self, spider, request):
         key = self._request_key(request)
         try:
-            ts = self.db.Get('%s_time' % key)
+            ts = self.db.Get(f'{key}_time')
         except KeyError:
             return  # not found or invalid entry
 
@@ -337,7 +322,7 @@ class LeveldbCacheStorage(object):
             return  # expired
 
         try:
-            data = self.db.Get('%s_data' % key)
+            data = self.db.Get(f'{key}_data')
         except KeyError:
             return  # invalid entry
         else:

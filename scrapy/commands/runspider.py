@@ -13,7 +13,7 @@ def _import_file(filepath):
     dirname, file = os.path.split(abspath)
     fname, fext = os.path.splitext(file)
     if fext != '.py':
-        raise ValueError("Not a Python source file: %s" % abspath)
+        raise ValueError(f"Not a Python source file: {abspath}")
     if dirname:
         sys.path = [dirname] + sys.path
     try:

@@ -12,4 +12,4 @@ class VersionTest(ProcessTest, unittest.TestCase):
     @defer.inlineCallbacks
     def test_output(self):
         _, out, _ = yield self.execute([])
-        self.assertEqual(out.strip(), "Scrapy %s" % scrapy.__version__)
+        self.assertEqual(out.strip(), f"Scrapy {scrapy.__version__}")

@@ -33,16 +33,16 @@ class SpiderMiddlewareManager(MiddlewareManager):
             self.methods['process_start_requests'].insert(0, mw.process_start_requests)
 
     def scrape_response(self, scrape_func, response, request, spider):
-        fname = lambda f:'%s.%s' % (f.im_self.__class__.__name__, f.im_func.__name__)
+        fname = lambda f: f'{f.im_self.__class__.__name__}.{f.im_func.__name__}'
 
         def process_spider_input(response):
             for method in self.methods['process_spider_input']:
                 try:
                     result = method(response=response, spider=spider)
                     assert result is None, \
-                            'Middleware %s must returns None or ' \
-                            'raise an exception, got %s ' \
-                            % (fname(method), type(result))
+                                'Middleware %s must returns None or ' \
+                                'raise an exception, got %s ' \
+                                % (fname(method), type(result))
                 except:
                     return scrape_func(Failure(), request, spider)
             return scrape_func(response, request, spider)
@@ -51,9 +51,9 @@ class SpiderMiddlewareManager(MiddlewareManager):
             exception = _failure.value
             for method in self.methods['process_spider_exception']:
                 result = method(response=response, exception=exception, spider=spider)
-                assert result is None or _isiterable(result), \
-                    'Middleware %s must returns None, or an iterable object, got %s ' % \
-                    (fname(method), type(result))
+                assert result is None or _isiterable(
+                    result
+                ), f'Middleware {fname(method)} must returns None, or an iterable object, got {type(result)} '
                 if result is not None:
                     return result
             return _failure
@@ -61,9 +61,9 @@ class SpiderMiddlewareManager(MiddlewareManager):
         def process_spider_output(result):
             for method in self.methods['process_spider_output']:
                 result = method(response=response, result=result, spider=spider)
-                assert _isiterable(result), \
-                    'Middleware %s must returns an iterable object, got %s ' % \
-                    (fname(method), type(result))
+                assert _isiterable(
+                    result
+                ), f'Middleware {fname(method)} must returns an iterable object, got {type(result)} '
             return result
 
         dfd = mustbe_deferred(process_spider_input, response)

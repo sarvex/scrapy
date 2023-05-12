@@ -24,14 +24,14 @@ from scrapy.utils.python import get_func_args
 class IFeedStorage(Interface):
     """Interface that all Feed Storages must implement"""
 
-    def __init__(uri):
+    def __init__(self):
         """Initialize the storage with the parameters given in the URI"""
 
-    def open(spider):
+    def open(self):
         """Open the storage for the given spider. It must return a file-like
         object that will be used for the exporters"""
 
-    def store(file):
+    def store(self):
         """Store the given file stream"""
 
 
@@ -118,7 +118,7 @@ class FTPFeedStorage(BlockingFeedStorage):
         ftp.login(self.username, self.password)
         dirname, filename = posixpath.split(self.path)
         ftp_makedirs_cwd(ftp, dirname)
-        ftp.storbinary('STOR %s' % filename, file)
+        ftp.storbinary(f'STOR {filename}', file)
         ftp.quit()
 
 
@@ -155,8 +155,11 @@ class FeedExporter(object):
             # FIXME: remove for scrapy 0.17
             import warnings
             from scrapy.exceptions import ScrapyDeprecationWarning
-            warnings.warn("%s must receive a settings object as first constructor argument." % cls.__name__,
-                ScrapyDeprecationWarning, stacklevel=2)
+            warnings.warn(
+                f"{cls.__name__} must receive a settings object as first constructor argument.",
+                ScrapyDeprecationWarning,
+                stacklevel=2,
+            )
             o = cls()
         else:
             o = cls(crawler.settings)
@@ -192,8 +195,8 @@ class FeedExporter(object):
         return item
 
     def _load_components(self, setting_prefix):
-        conf = dict(self.settings['%s_BASE' % setting_prefix])
-        conf.update(self.settings[setting_prefix])
+        conf = dict(self.settings[f'{setting_prefix}_BASE'])
+        conf |= self.settings[setting_prefix]
         d = {}
         for k, v in conf.items():
             try:
@@ -205,7 +208,7 @@ class FeedExporter(object):
     def _exporter_supported(self, format):
         if format in self.exporters:
             return True
-        log.msg("Unknown feed format: %s" % format, log.ERROR)
+        log.msg(f"Unknown feed format: {format}", log.ERROR)
 
     def _storage_supported(self, uri):
         scheme = urlparse(uri).scheme
@@ -214,9 +217,9 @@ class FeedExporter(object):
                 self._get_storage(uri)
                 return True
             except NotConfigured:
-                log.msg("Disabled feed storage scheme: %s" % scheme, log.ERROR)
+                log.msg(f"Disabled feed storage scheme: {scheme}", log.ERROR)
         else:
-            log.msg("Unknown feed storage scheme: %s" % scheme, log.ERROR)
+            log.msg(f"Unknown feed storage scheme: {scheme}", log.ERROR)
 
     def _get_exporter(self, *a, **kw):
         return self.exporters[self.format](*a, **kw)
@@ -225,9 +228,7 @@ class FeedExporter(object):
         return self.storages[urlparse(uri).scheme](uri)
 
     def _get_uri_params(self, spider):
-        params = {}
-        for k in dir(spider):
-            params[k] = getattr(spider, k)
+        params = {k: getattr(spider, k) for k in dir(spider)}
         ts = datetime.utcnow().replace(microsecond=0).isoformat().replace(':', '-')
         params['time'] = ts
         self._uripar(params, spider)

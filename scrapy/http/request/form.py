@@ -61,17 +61,15 @@ def _get_form(response, formname, formnumber, formxpath):
     root = LxmlDocument(response, lxml.html.HTMLParser)
     forms = root.xpath('//form')
     if not forms:
-        raise ValueError("No <form> element found in %s" % response)
+        raise ValueError(f"No <form> element found in {response}")
 
     if formname is not None:
-        f = root.xpath('//form[@name="%s"]' % formname)
-        if f:
+        if f := root.xpath(f'//form[@name="{formname}"]'):
             return f[0]
 
     # Get form element from xpath, if not found, go up
     if formxpath is not None:
-        nodes = root.xpath(formxpath)
-        if nodes:
+        if nodes := root.xpath(formxpath):
             el = nodes[0]
             while True:
                 if el.tag == 'form':
@@ -79,7 +77,7 @@ def _get_form(response, formname, formnumber, formxpath):
                 el = el.getparent()
                 if el is None:
                     break
-        raise ValueError('No <form> element found with %s' % formxpath)
+        raise ValueError(f'No <form> element found with {formxpath}')
 
     # If we get here, it means that either formname was None
     # or invalid
@@ -109,7 +107,11 @@ def _get_inputs(form, formdata, dont_click, clickdata, response):
 
     if not dont_click:
         clickable = _get_clickable(clickdata, form)
-        if clickable and clickable[0] not in formdata and not clickable[0] is None:
+        if (
+            clickable
+            and clickable[0] not in formdata
+            and clickable[0] is not None
+        ):
             values.append(clickable)
 
     values.extend(formdata.items())
@@ -119,9 +121,7 @@ def _get_inputs(form, formdata, dont_click, clickdata, response):
 def _value(ele):
     n = ele.name
     v = ele.value
-    if ele.tag == 'select':
-        return _select_value(ele, n, v)
-    return n, v
+    return _select_value(ele, n, v) if ele.tag == 'select' else (n, v)
 
 
 def _select_value(ele, n, v):
@@ -145,7 +145,7 @@ def _get_clickable(clickdata, form):
     if the latter is given. If not, it returns the first
     clickable element found
     """
-    clickables = [el for el in form.xpath('.//input[@type="submit"]')]
+    clickables = list(form.xpath('.//input[@type="submit"]'))
     if not clickables:
         return
 

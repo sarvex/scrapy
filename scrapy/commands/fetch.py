@@ -30,7 +30,7 @@ class Command(ScrapyCommand):
     def _print_headers(self, headers, prefix):
         for key, values in headers.items():
             for value in values:
-                print('%s %s: %s' % (prefix, key, value))
+                print(f'{prefix} {key}: {value}')
 
     def _print_response(self, response, opts):
         if opts.headers:

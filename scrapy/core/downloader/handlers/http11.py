@@ -174,8 +174,7 @@ class ScrapyAgent(object):
 
     def _get_agent(self, request, timeout):
         bindaddress = request.meta.get('bindaddress') or self._bindAddress
-        proxy = request.meta.get('proxy')
-        if proxy:
+        if proxy := request.meta.get('proxy'):
             _, _, proxyHost, proxyPort, proxyParams = _parse(proxy)
             scheme = _parse(request.url)[0]
             omitConnectTunnel = proxyParams.find('noconnect') >= 0
@@ -221,7 +220,7 @@ class ScrapyAgent(object):
         if self._timeout_cl.active():
             self._timeout_cl.cancel()
             return result
-        raise TimeoutError("Getting %s took longer than %s seconds." % (url, timeout))
+        raise TimeoutError(f"Getting {url} took longer than {timeout} seconds.")
 
     def _cb_latency(self, result, request, start_time):
         request.meta['download_latency'] = time() - start_time
@@ -237,14 +236,18 @@ class ScrapyAgent(object):
         expected_size = txresponse.length if txresponse.length != UNKNOWN_LENGTH else -1
 
         if maxsize and expected_size > maxsize:
-            log.msg("Expected response size (%s) larger than download max size (%s)." % (expected_size, maxsize),
-                    logLevel=log.ERROR)
+            log.msg(
+                f"Expected response size ({expected_size}) larger than download max size ({maxsize}).",
+                logLevel=log.ERROR,
+            )
             txresponse._transport._producer.loseConnection()
             raise defer.CancelledError()
 
         if warnsize and expected_size > warnsize:
-            log.msg("Expected response size (%s) larger than downlod warn size (%s)." % (expected_size, warnsize),
-                    logLevel=log.WARNING)
+            log.msg(
+                f"Expected response size ({expected_size}) larger than downlod warn size ({warnsize}).",
+                logLevel=log.WARNING,
+            )
 
         def _cancel(_):
             txresponse._transport._producer.loseConnection()
@@ -295,13 +298,17 @@ class _ResponseReader(protocol.Protocol):
         self._bytes_received += len(bodyBytes)
 
         if self._maxsize and self._bytes_received > self._maxsize:
-            log.msg("Received (%s) bytes larger than download max size (%s)." % (self._bytes_received, self._maxsize),
-                    logLevel=log.ERROR)
+            log.msg(
+                f"Received ({self._bytes_received}) bytes larger than download max size ({self._maxsize}).",
+                logLevel=log.ERROR,
+            )
             self._finished.cancel()
 
         if self._warnsize and self._bytes_received > self._warnsize:
-            log.msg("Received (%s) bytes larger than download warn size (%s)." % (self._bytes_received, self._warnsize),
-                    logLevel=log.WARNING)
+            log.msg(
+                f"Received ({self._bytes_received}) bytes larger than download warn size ({self._warnsize}).",
+                logLevel=log.WARNING,
+            )
 
     def connectionLost(self, reason):
         if self._finished.called:

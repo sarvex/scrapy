@@ -22,10 +22,7 @@ class Rule(object):
         self.cb_kwargs = cb_kwargs or {}
         self.process_links = process_links
         self.process_request = process_request
-        if follow is None:
-            self.follow = False if callback else True
-        else:
-            self.follow = follow
+        self.follow = not callback if follow is None else follow
 
 class CrawlSpider(Spider):
 
@@ -66,12 +63,9 @@ class CrawlSpider(Spider):
         if callback:
             cb_res = callback(response, **cb_kwargs) or ()
             cb_res = self.process_results(response, cb_res)
-            for requests_or_item in iterate_spider_output(cb_res):
-                yield requests_or_item
-
+            yield from iterate_spider_output(cb_res)
         if follow and self._follow_links:
-            for request_or_item in self._requests_to_follow(response):
-                yield request_or_item
+            yield from self._requests_to_follow(response)
 
     def _compile_rules(self):
         def get_method(method):

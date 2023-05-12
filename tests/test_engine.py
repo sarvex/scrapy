@@ -50,12 +50,10 @@ class TestSpider(Spider):
 
     def parse_item(self, response):
         item = TestItem()
-        m = self.name_re.search(response.body)
-        if m:
+        if m := self.name_re.search(response.body):
             item['name'] = m.group(1)
         item['url'] = response.url
-        m = self.price_re.search(response.body)
-        if m:
+        if m := self.price_re.search(response.body):
             item['price'] = m.group(1)
         return item
 
@@ -122,7 +120,7 @@ class CrawlerRun(object):
         self.deferred.callback(None)
 
     def geturl(self, path):
-        return "http://localhost:%s%s" % (self.portno, path)
+        return f"http://localhost:{self.portno}{path}"
 
     def getpath(self, url):
         u = urlparse(url)
@@ -167,17 +165,19 @@ class EngineTest(unittest.TestCase):
     def _assert_visited_urls(self):
         must_be_visited = ["/", "/redirect", "/redirected",
                            "/item1.html", "/item2.html", "/item999.html"]
-        urls_visited = set([rp[0].url for rp in self.run.respplug])
-        urls_expected = set([self.run.geturl(p) for p in must_be_visited])
-        assert urls_expected <= urls_visited, "URLs not visited: %s" % list(urls_expected - urls_visited)
+        urls_visited = {rp[0].url for rp in self.run.respplug}
+        urls_expected = {self.run.geturl(p) for p in must_be_visited}
+        assert (
+            urls_expected <= urls_visited
+        ), f"URLs not visited: {list(urls_expected - urls_visited)}"
 
     def _assert_scheduled_requests(self, urls_to_visit=None):
         self.assertEqual(urls_to_visit, len(self.run.reqplug))
 
         paths_expected = ['/item999.html', '/item2.html', '/item1.html']
 
-        urls_requested = set([rq[0].url for rq in self.run.reqplug])
-        urls_expected = set([self.run.geturl(p) for p in paths_expected])
+        urls_requested = {rq[0].url for rq in self.run.reqplug}
+        urls_expected = {self.run.geturl(p) for p in paths_expected}
         assert urls_expected <= urls_requested
         scheduled_requests_count = len(self.run.reqplug)
         dropped_requests_count = len(self.run.reqdropped)
@@ -225,7 +225,6 @@ class EngineTest(unittest.TestCase):
                          self.run.signals_catched[signals.spider_closed])
 
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == 'runserver':
-        start_test_site(debug=True)
-        reactor.run()
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == 'runserver':
+    start_test_site(debug=True)
+    reactor.run()

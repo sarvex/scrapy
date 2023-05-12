@@ -18,7 +18,7 @@ def inside_project():
         try:
             import_module(scrapy_module)
         except ImportError as exc:
-            warnings.warn("Cannot import scrapy settings module %s: %s" % (scrapy_module, exc))
+            warnings.warn(f"Cannot import scrapy settings module {scrapy_module}: {exc}")
         else:
             return True
     return bool(closest_scrapy_cfg())
@@ -30,11 +30,10 @@ def project_data_dir(project='default'):
     cfg = get_config()
     if cfg.has_option(DATADIR_CFG_SECTION, project):
         d = cfg.get(DATADIR_CFG_SECTION, project)
-    else:
-        scrapy_cfg = closest_scrapy_cfg()
-        if not scrapy_cfg:
-            raise NotConfigured("Unable to find scrapy.cfg file to infer project data dir")
+    elif scrapy_cfg := closest_scrapy_cfg():
         d = abspath(join(dirname(scrapy_cfg), '.scrapy'))
+    else:
+        raise NotConfigured("Unable to find scrapy.cfg file to infer project data dir")
     if not exists(d):
         os.makedirs(d)
     return d
@@ -55,19 +54,17 @@ def get_project_settings():
         init_env(project)
 
     settings = Settings()
-    settings_module_path = os.environ.get(ENVVAR)
-    if settings_module_path:
+    if settings_module_path := os.environ.get(ENVVAR):
         settings.setmodule(settings_module_path, priority='project')
 
-    # XXX: remove this hack
-    pickled_settings = os.environ.get("SCRAPY_PICKLED_SETTINGS_TO_OVERRIDE")
-    if pickled_settings:
+    if pickled_settings := os.environ.get(
+        "SCRAPY_PICKLED_SETTINGS_TO_OVERRIDE"
+    ):
         settings.setdict(pickle.loads(pickled_settings), priority='project')
 
-    # XXX: deprecate and remove this functionality
-    env_overrides = {k[7:]: v for k, v in os.environ.items() if
-                     k.startswith('SCRAPY_')}
-    if env_overrides:
+    if env_overrides := {
+        k[7:]: v for k, v in os.environ.items() if k.startswith('SCRAPY_')
+    }:
         settings.setdict(env_overrides, priority='project')
 
     return settings

@@ -33,7 +33,7 @@ class Headers(CaselessDict):
         elif isinstance(x, int):
             return six.text_type(x).encode(self.encoding)
         else:
-            raise TypeError('Unsupported value type: {}'.format(type(x)))
+            raise TypeError(f'Unsupported value type: {type(x)}')
 
     def __getitem__(self, key):
         try:
@@ -51,9 +51,7 @@ class Headers(CaselessDict):
         try:
             return super(Headers, self).__getitem__(key)
         except KeyError:
-            if def_val is not None:
-                return self.normvalue(def_val)
-            return []
+            return self.normvalue(def_val) if def_val is not None else []
 
     def setlist(self, key, list_):
         self[key] = list_

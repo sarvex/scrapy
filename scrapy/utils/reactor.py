@@ -2,7 +2,7 @@ from twisted.internet import reactor, error
 
 def listen_tcp(portrange, host, factory):
     """Like reactor.listenTCP but tries different ports in a range."""
-    assert len(portrange) <= 2, "invalid portrange: %s" % portrange
+    assert len(portrange) <= 2, f"invalid portrange: {portrange}"
     if not hasattr(portrange, '__iter__'):
         return reactor.listenTCP(portrange, factory, interface=host)
     if not portrange:

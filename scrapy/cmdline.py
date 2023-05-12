@@ -39,24 +39,21 @@ def _get_commands_from_entry_points(inproject, group='scrapy.commands'):
         if inspect.isclass(obj):
             cmds[entry_point.name] = obj()
         else:
-            raise Exception("Invalid entry point %s" % entry_point.name)
+            raise Exception(f"Invalid entry point {entry_point.name}")
     return cmds
 
 def _get_commands_dict(settings, inproject):
     cmds = _get_commands_from_module('scrapy.commands', inproject)
     cmds.update(_get_commands_from_entry_points(inproject))
-    cmds_module = settings['COMMANDS_MODULE']
-    if cmds_module:
+    if cmds_module := settings['COMMANDS_MODULE']:
         cmds.update(_get_commands_from_module(cmds_module, inproject))
     return cmds
 
 def _pop_command_name(argv):
-    i = 0
-    for arg in argv[1:]:
+    for i, arg in enumerate(argv[1:]):
         if not arg.startswith('-'):
             del argv[i]
             return arg
-        i += 1
 
 def _print_header(settings, inproject):
     if inproject:
@@ -131,7 +128,7 @@ def execute(argv=None, settings=None):
         sys.exit(2)
 
     cmd = cmds[cmdname]
-    parser.usage = "scrapy %s %s" % (cmdname, cmd.syntax())
+    parser.usage = f"scrapy {cmdname} {cmd.syntax()}"
     parser.description = cmd.long_desc()
     settings.setdict(cmd.default_settings, priority='command')
     cmd.settings = settings

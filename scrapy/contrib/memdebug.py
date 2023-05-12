@@ -31,4 +31,6 @@ class MemoryDebugger(object):
         for cls, wdict in six.iteritems(live_refs):
             if not wdict:
                 continue
-            self.stats.set_value('memdebug/live_refs/%s' % cls.__name__, len(wdict), spider=spider)
+            self.stats.set_value(
+                f'memdebug/live_refs/{cls.__name__}', len(wdict), spider=spider
+            )

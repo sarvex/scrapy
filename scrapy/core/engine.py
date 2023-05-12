@@ -153,8 +153,7 @@ class ExecutionEngine(object):
         pending = self.slot.scheduler.has_pending_requests()
         downloading = bool(self.downloader.active)
         pending_start_requests = self.slot.start_requests is not None
-        idle = scraper_idle and not (pending or downloading or pending_start_requests)
-        return idle
+        return scraper_idle and not (pending or downloading or pending_start_requests)
 
     @property
     def open_spiders(self):
@@ -286,8 +285,7 @@ class ExecutionEngine(object):
 
     def _close_all_spiders(self):
         dfds = [self.close_spider(s, reason='shutdown') for s in self.open_spiders]
-        dlist = defer.DeferredList(dfds)
-        return dlist
+        return defer.DeferredList(dfds)
 
     @defer.inlineCallbacks
     def _finish_stopping_engine(self):

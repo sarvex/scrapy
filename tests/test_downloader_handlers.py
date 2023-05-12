@@ -74,9 +74,8 @@ class FileTestCase(unittest.TestCase):
 
     def setUp(self):
         self.tmpname = self.mktemp()
-        fd = open(self.tmpname + '^', 'w')
-        fd.write('0123456789')
-        fd.close()
+        with open(f'{self.tmpname}^', 'w') as fd:
+            fd.write('0123456789')
         self.download_request = FileDownloadHandler(Settings()).download_request
 
     def test_download(self):
@@ -85,12 +84,12 @@ class FileTestCase(unittest.TestCase):
             self.assertEquals(response.status, 200)
             self.assertEquals(response.body, '0123456789')
 
-        request = Request(path_to_file_uri(self.tmpname + '^'))
+        request = Request(path_to_file_uri(f'{self.tmpname}^'))
         assert request.url.upper().endswith('%5E')
         return self.download_request(request, Spider('foo')).addCallback(_test)
 
     def test_non_existent(self):
-        request = Request('file://%s' % self.mktemp())
+        request = Request(f'file://{self.mktemp()}')
         d = self.download_request(request, Spider('foo'))
         return self.assertFailure(d, IOError)
 
@@ -183,11 +182,6 @@ class HttpTestCase(unittest.TestCase):
 
         request = Request(self.getURL('host'), headers={'Host': 'example.com'})
         return self.download_request(request, Spider('foo')).addCallback(_test)
-
-        d = self.download_request(request, Spider('foo'))
-        d.addCallback(lambda r: r.body)
-        d.addCallback(self.assertEquals, 'example.com')
-        return d
 
     def test_payload(self):
         body = '1'*100 # PayloadResource requires body length to be 100
@@ -282,7 +276,7 @@ class Http11MockServerTestCase(unittest.TestCase):
         crawler = get_crawler(SingleRequestSpider)
         yield crawler.crawl(seed=Request(url='http://localhost:8998'))
         failure = crawler.spider.meta.get('failure')
-        self.assertTrue(failure == None)
+        self.assertTrue(failure is None)
         reason = crawler.spider.meta['close_reason']
         self.assertTrue(reason, 'finished')
 
@@ -305,7 +299,7 @@ class Http11MockServerTestCase(unittest.TestCase):
 
             # download_maxsize = 50 is enough for the gzipped response
             failure = crawler.spider.meta.get('failure')
-            self.assertTrue(failure == None)
+            self.assertTrue(failure is None)
             reason = crawler.spider.meta['close_reason']
             self.assertTrue(reason, 'finished')
         else:
@@ -358,7 +352,7 @@ class HttpProxyTestCase(unittest.TestCase):
             self.assertEquals(response.url, request.url)
             self.assertEquals(response.body, 'https://example.com')
 
-        http_proxy = '%s?noconnect' % self.getURL('')
+        http_proxy = f"{self.getURL('')}?noconnect"
         request = Request('https://example.com', meta={'proxy': http_proxy})
         return self.download_request(request, Spider('foo')).addCallback(_test)
 
@@ -537,29 +531,41 @@ class FTPTestCase(unittest.TestCase):
         return deferred
 
     def test_ftp_download_success(self):
-        request = Request(url="ftp://127.0.0.1:%s/file.txt" % self.portNum,
-                meta={"ftp_user": self.username, "ftp_password": self.password})
+        request = Request(
+            url=f"ftp://127.0.0.1:{self.portNum}/file.txt",
+            meta={"ftp_user": self.username, "ftp_password": self.password},
+        )
         d = self.download_handler.download_request(request, None)
 
         def _test(r):
             self.assertEqual(r.status, 200)
             self.assertEqual(r.body, 'I have the power!')
             self.assertEqual(r.headers, {'Local Filename': [''], 'Size': ['17']})
+
         return self._add_test_callbacks(d, _test)
 
     def test_ftp_download_notexist(self):
-        request = Request(url="ftp://127.0.0.1:%s/notexist.txt" % self.portNum,
-                meta={"ftp_user": self.username, "ftp_password": self.password})
+        request = Request(
+            url=f"ftp://127.0.0.1:{self.portNum}/notexist.txt",
+            meta={"ftp_user": self.username, "ftp_password": self.password},
+        )
         d = self.download_handler.download_request(request, None)
 
         def _test(r):
             self.assertEqual(r.status, 404)
+
         return self._add_test_callbacks(d, _test)
 
     def test_ftp_local_filename(self):
         local_fname = "/tmp/file.txt"
-        request = Request(url="ftp://127.0.0.1:%s/file.txt" % self.portNum,
-                meta={"ftp_user": self.username, "ftp_password": self.password, "ftp_local_filename": local_fname})
+        request = Request(
+            url=f"ftp://127.0.0.1:{self.portNum}/file.txt",
+            meta={
+                "ftp_user": self.username,
+                "ftp_password": self.password,
+                "ftp_local_filename": local_fname,
+            },
+        )
         d = self.download_handler.download_request(request, None)
 
         def _test(r):
@@ -569,13 +575,17 @@ class FTPTestCase(unittest.TestCase):
             with open(local_fname) as f:
                 self.assertEqual(f.read(), "I have the power!")
             os.remove(local_fname)
+
         return self._add_test_callbacks(d, _test)
 
     def test_invalid_credentials(self):
-        request = Request(url="ftp://127.0.0.1:%s/file.txt" % self.portNum,
-                meta={"ftp_user": self.username, "ftp_password": 'invalid'})
+        request = Request(
+            url=f"ftp://127.0.0.1:{self.portNum}/file.txt",
+            meta={"ftp_user": self.username, "ftp_password": 'invalid'},
+        )
         d = self.download_handler.download_request(request, None)
 
         def _test(r):
             self.assertEqual(r.type, ConnectionLost)
+
         return self._add_test_callbacks(d, errback=_test)

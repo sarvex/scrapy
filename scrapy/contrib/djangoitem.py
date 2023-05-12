@@ -69,7 +69,8 @@ class DjangoItem(Item):
     @property
     def instance(self):
         if self._instance is None:
-            modelargs = dict((k, self.get(k)) for k in self._values
-                             if k in self._model_fields)
+            modelargs = {
+                k: self.get(k) for k in self._values if k in self._model_fields
+            }
             self._instance = self.django_model(**modelargs)
         return self._instance

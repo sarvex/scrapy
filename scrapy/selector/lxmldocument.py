@@ -28,4 +28,4 @@ class LxmlDocument(object_ref):
         return cache[parser]
 
     def __str__(self):
-        return "<LxmlDocument %s>" % self.root.tag
+        return f"<LxmlDocument {self.root.tag}>"

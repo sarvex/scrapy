@@ -63,7 +63,9 @@ def str_to_unicode(text, encoding=None, errors='strict'):
     elif isinstance(text, unicode):
         return text
     else:
-        raise TypeError('str_to_unicode must receive a str or unicode object, got %s' % type(text).__name__)
+        raise TypeError(
+            f'str_to_unicode must receive a str or unicode object, got {type(text).__name__}'
+        )
 
 def unicode_to_str(text, encoding=None, errors='strict'):
     """Return the str representation of text in the given encoding. Unlike
@@ -79,7 +81,9 @@ def unicode_to_str(text, encoding=None, errors='strict'):
     elif isinstance(text, str):
         return text
     else:
-        raise TypeError('unicode_to_str must receive a unicode or str object, got %s' % type(text).__name__)
+        raise TypeError(
+            f'unicode_to_str must receive a unicode or str object, got {type(text).__name__}'
+        )
 
 def re_rsearch(pattern, text, chunk_size=1024):
     """
@@ -105,7 +109,7 @@ def re_rsearch(pattern, text, chunk_size=1024):
 
     pattern = re.compile(pattern) if isinstance(pattern, basestring) else pattern
     for chunk, offset in _chunk_iter():
-        matches = [match for match in pattern.finditer(chunk)]
+        matches = list(pattern.finditer(chunk))
         if matches:
             return (offset + matches[-1].span()[0], offset + matches[-1].span()[1])
     return None
@@ -122,13 +126,13 @@ def memoizemethod_noargs(method):
         return cache[self]
     return new_method
 
-_BINARYCHARS = set(map(chr, range(32))) - set(["\0", "\t", "\n", "\r"])
+_BINARYCHARS = set(map(chr, range(32))) - {"\0", "\t", "\n", "\r"}
 
 def isbinarytext(text):
     """Return True if the given text is considered binary, or false
     otherwise, by looking for binary bytes at their chars
     """
-    assert isinstance(text, str), "text must be str, got '%s'" % type(text).__name__
+    assert isinstance(text, str), f"text must be str, got '{type(text).__name__}'"
     return any(c in _BINARYCHARS for c in text)
 
 def get_func_args(func, stripself=False):
@@ -152,7 +156,7 @@ def get_func_args(func, stripself=False):
         else:
             return get_func_args(func.__call__, True)
     else:
-        raise TypeError('%s is not callable' % type(func))
+        raise TypeError(f'{type(func)} is not callable')
     if stripself:
         func_args.pop(0)
     return func_args
@@ -184,7 +188,7 @@ def get_spec(func):
     elif hasattr(func, '__call__'):
         spec = inspect.getargspec(func.__call__)
     else:
-        raise TypeError('%s is not callable' % type(func))
+        raise TypeError(f'{type(func)} is not callable')
 
     defaults = spec.defaults or []
 
@@ -202,7 +206,7 @@ def equal_attributes(obj1, obj2, attributes):
     for attr in attributes:
         # support callables like itemgetter
         if callable(attr):
-            if not attr(obj1) == attr(obj2):
+            if attr(obj1) != attr(obj2):
                 return False
         else:
             # check that objects has attribute
@@ -211,7 +215,7 @@ def equal_attributes(obj1, obj2, attributes):
             if not hasattr(obj2, attr):
                 return False
             # compare object attributes
-            if not getattr(obj1, attr) == getattr(obj2, attr):
+            if getattr(obj1, attr) != getattr(obj2, attr):
                 return False
     # all attributes equal
     return True

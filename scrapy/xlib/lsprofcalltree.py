@@ -48,8 +48,8 @@ class KCacheGrind(object):
         if isinstance(code, str):
             print('fi=~', file=out_file)
         else:
-            print('fi=%s' % (code.co_filename,), file=out_file)
-        print('fn=%s' % (label(code),), file=out_file)
+            print(f'fi={code.co_filename}', file=out_file)
+        print(f'fn={label(code)}', file=out_file)
 
         inlinetime = int(entry.inlinetime * 1000)
         if isinstance(code, str):
@@ -58,16 +58,8 @@ class KCacheGrind(object):
             print('%d %d' % (code.co_firstlineno, inlinetime), file=out_file)
 
         # recursive calls are counted in entry.calls
-        if entry.calls:
-            calls = entry.calls
-        else:
-            calls = []
-
-        if isinstance(code, str):
-            lineno = 0
-        else:
-            lineno = code.co_firstlineno
-
+        calls = entry.calls if entry.calls else []
+        lineno = 0 if isinstance(code, str) else code.co_firstlineno
         for subentry in calls:
             self._subentry(lineno, subentry)
         print(file=out_file)
@@ -76,12 +68,12 @@ class KCacheGrind(object):
         out_file = self.out_file
         code = subentry.code
         #print >> out_file, 'cob=%s' % (code.co_filename,)
-        print('cfn=%s' % (label(code),), file=out_file)
+        print(f'cfn={label(code)}', file=out_file)
         if isinstance(code, str):
             print('cfi=~', file=out_file)
             print('calls=%d 0' % (subentry.callcount,), file=out_file)
         else:
-            print('cfi=%s' % (code.co_filename,), file=out_file)
+            print(f'cfi={code.co_filename}', file=out_file)
             print('calls=%d %d' % (
                 subentry.callcount, code.co_firstlineno), file=out_file)
 
@@ -102,16 +94,15 @@ def main(args):
     options, args = parser.parse_args()
 
     if not options.outfile:
-        options.outfile = '%s.log' % os.path.basename(args[0])
+        options.outfile = f'{os.path.basename(args[0])}.log'
 
     sys.argv[:] = args
 
     prof = cProfile.Profile()
     try:
-        try:
-            prof = prof.run('execfile(%r)' % (sys.argv[0],))
-        except SystemExit:
-            pass
+        prof = prof.run('execfile(%r)' % (sys.argv[0],))
+    except SystemExit:
+        pass
     finally:
         kg = KCacheGrind(prof)
         kg.output(file(options.outfile, 'w'))

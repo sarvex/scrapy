@@ -30,10 +30,7 @@ else:
 
 
 def getarg(request, name, default=None, type=str):
-    if name in request.args:
-        return type(request.args[name][0])
-    else:
-        return default
+    return type(request.args[name][0]) if name in request.args else default
 
 
 class LeafResource(Resource):
@@ -84,8 +81,7 @@ class Delay(LeafResource):
 
     def render_GET(self, request):
         n = getarg(request, "n", 1, type=float)
-        b = getarg(request, "b", 1, type=int)
-        if b:
+        if b := getarg(request, "b", 1, type=int):
             # send headers now and delay body
             request.write('')
         self.deferRequest(request, n, self._delayedRender, request, n)

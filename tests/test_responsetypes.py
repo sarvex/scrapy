@@ -16,7 +16,7 @@ class ResponseTypesTest(unittest.TestCase):
         ]
         for source, cls in mappings:
             retcls = responsetypes.from_filename(source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
 
     def test_from_content_disposition(self):
         mappings = [
@@ -25,7 +25,7 @@ class ResponseTypesTest(unittest.TestCase):
         ]
         for source, cls in mappings:
             retcls = responsetypes.from_content_disposition(source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
 
     def test_from_content_type(self):
         mappings = [
@@ -38,7 +38,7 @@ class ResponseTypesTest(unittest.TestCase):
         ]
         for source, cls in mappings:
             retcls = responsetypes.from_content_type(source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
 
     def test_from_body(self):
         mappings = [
@@ -49,7 +49,7 @@ class ResponseTypesTest(unittest.TestCase):
         ]
         for source, cls in mappings:
             retcls = responsetypes.from_body(source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
         
     def test_from_headers(self):
         mappings = [
@@ -60,7 +60,7 @@ class ResponseTypesTest(unittest.TestCase):
         for source, cls in mappings:
             source = Headers(source)
             retcls = responsetypes.from_headers(source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
 
     def test_from_args(self):
         # TODO: add more tests that check precedence between the different arguments
@@ -74,7 +74,7 @@ class ResponseTypesTest(unittest.TestCase):
         ]
         for source, cls in mappings:
             retcls = responsetypes.from_args(**source)
-            assert retcls is cls, "%s ==> %s != %s" % (source, retcls, cls)
+            assert retcls is cls, f"{source} ==> {retcls} != {cls}"
 
     def test_custom_mime_types_loaded(self):
         # check that mime.types files shipped with scrapy are loaded

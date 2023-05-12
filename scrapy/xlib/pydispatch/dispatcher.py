@@ -219,11 +219,7 @@ def disconnect(receiver, signal=Any, sender=Any, weak=True):
 		_removeOldBackRefs(senderkey, signal, receiver, receivers)
 	except ValueError:
 		raise errors.DispatcherKeyError(
-			"""No connection to receiver %s for signal %s from sender %s""" %(
-				receiver,
-				signal,
-				sender
-			)
+			f"""No connection to receiver {receiver} for signal {signal} from sender {sender}"""
 		)
 	_cleanupConnections(senderkey, signal)
 
@@ -438,8 +434,8 @@ def _removeBackrefs( senderkey):
 		items = signals.items()
 		def allReceivers( ):
 			for signal,set in items:
-				for item in set:
-					yield item
+				yield from set
+
 		for receiver in allReceivers():
 			_killBackref( receiver, senderkey )
 

@@ -18,7 +18,7 @@ except ImportError:
     from urllib.parse import urlunparse as _urlunparse
 
     def urlunparse(parts):
-        result = _urlunparse(tuple([p.decode("charmap") for p in parts]))
+        result = _urlunparse(tuple(p.decode("charmap") for p in parts))
         return result.encode("charmap")
 import zlib
 
@@ -52,7 +52,7 @@ class _URL(tuple):
 
     At some point this should be replaced with a better URL implementation.
     """
-    def __new__(self, scheme, host, port, path):
+    def __new__(cls, scheme, host, port, path):
         return tuple.__new__(_URL, (scheme, host, port, path))
 
 
@@ -83,11 +83,7 @@ def _parse(url, defaultPort=None):
     path = urlunparse((b'', b'') + parsed[2:])
 
     if defaultPort is None:
-        if scheme == b'https':
-            defaultPort = 443
-        else:
-            defaultPort = 80
-
+        defaultPort = 443 if scheme == b'https' else 80
     host, port = parsed[1], defaultPort
     if b':' in host:
         host, port = host.split(b':')
@@ -354,9 +350,7 @@ class _RetryingHTTP11ClientProtocol(object):
             for failure in exception.reasons:
                 if failure.check(defer.CancelledError):
                     return False
-        if bodyProducer is not None:
-            return False
-        return True
+        return bodyProducer is None
 
 
     def request(self, request):
@@ -526,8 +520,7 @@ class HTTPConnectionPool(object):
         """
         results = []
         for protocols in self._connections.itervalues():
-            for p in protocols:
-                results.append(p.abort())
+            results.extend(p.abort() for p in protocols)
         self._connections = {}
         for dc in self._timeouts.values():
             dc.cancel()
@@ -777,9 +770,7 @@ class _FakeUrllib2Request(object):
 
     def get_header(self, name, default=None):
         headers = self.headers.getRawHeaders(name, default)
-        if headers is not None:
-            return headers[0]
-        return None
+        return headers[0] if headers is not None else None
 
 
     def get_host(self):
@@ -984,10 +975,7 @@ class ContentDecoderAgent(object):
 
         @see: L{Agent.request}.
         """
-        if headers is None:
-            headers = Headers()
-        else:
-            headers = headers.copy()
+        headers = Headers() if headers is None else headers.copy()
         headers.addRawHeader('accept-encoding', self._supported)
         deferred = self._agent.request(method, uri, headers, bodyProducer)
         return deferred.addCallback(self._handleResponse)

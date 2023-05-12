@@ -7,7 +7,7 @@ def xmliter_lxml(obj, nodename, namespace=None):
     reader = _StreamReader(obj)
     tag = '{%s}%s' % (namespace, nodename) if namespace else nodename
     iterable = etree.iterparse(reader, tag=tag, encoding=reader.encoding)
-    selxpath = '//' + ('x:%s' % nodename if namespace else nodename)
+    selxpath = '//' + (f'x:{nodename}' if namespace else nodename)
     for _, node in iterable:
         nodetext = etree.tostring(node)
         node.clear()

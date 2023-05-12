@@ -36,8 +36,7 @@ class SpiderManagerTest(unittest.TestCase):
         verifyObject(ISpiderManager, self.spiderman)
 
     def test_list(self):
-        self.assertEqual(set(self.spiderman.list()),
-            set(['spider1', 'spider2', 'spider3']))
+        self.assertEqual(set(self.spiderman.list()), {'spider1', 'spider2', 'spider3'})
 
     def test_load(self):
         spider1 = self.spiderman.load("spider1")
@@ -48,8 +47,12 @@ class SpiderManagerTest(unittest.TestCase):
             ['spider1'])
         self.assertEqual(self.spiderman.find_by_request(Request('http://scrapy2.org/test')),
             ['spider2'])
-        self.assertEqual(set(self.spiderman.find_by_request(Request('http://scrapy3.org/test'))),
-            set(['spider1', 'spider2']))
+        self.assertEqual(
+            set(
+                self.spiderman.find_by_request(Request('http://scrapy3.org/test'))
+            ),
+            {'spider1', 'spider2'},
+        )
         self.assertEqual(self.spiderman.find_by_request(Request('http://scrapy999.org/test')),
             [])
         self.assertEqual(self.spiderman.find_by_request(Request('http://spider3.com')),

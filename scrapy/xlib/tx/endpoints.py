@@ -691,11 +691,11 @@ def _parseSSL(factory, port, privateKey="server.pem", certKey=None,
     from twisted.internet import ssl
     if certKey is None:
         certKey = privateKey
-    kw = {}
-    if sslmethod is not None:
-        kw['method'] = getattr(ssl.SSL, sslmethod)
-    else:
-        kw['method'] = ssl.SSL.SSLv23_METHOD
+    kw = {
+        'method': getattr(ssl.SSL, sslmethod)
+        if sslmethod is not None
+        else ssl.SSL.SSLv23_METHOD
+    }
     certPEM = FilePath(certKey).getContent()
     keyPEM = FilePath(privateKey).getContent()
     privateCertificate = ssl.PrivateCertificate.loadPEM(certPEM + keyPEM)
@@ -896,7 +896,7 @@ def _parseServer(description, factory, default=None):
             raise ValueError(deprecationMessage)
         # If the default has been otherwise specified, the user has already
         # been warned.
-        args[0:0] = [default]
+        args[:0] = [default]
     endpointType = args[0]
     parser = _serverParsers.get(endpointType)
     if parser is None:
@@ -905,7 +905,7 @@ def _parseServer(description, factory, default=None):
         for plugin in getPlugins(IStreamServerEndpointStringParser):
             if plugin.prefix == endpointType:
                 return (plugin, args[1:], kw)
-        raise ValueError("Unknown endpoint type: '%s'" % (endpointType,))
+        raise ValueError(f"Unknown endpoint type: '{endpointType}'")
     return (endpointType.upper(),) + parser(factory, *args[1:], **kw)
 
 
@@ -1071,7 +1071,7 @@ def _loadCAsFromDir(directoryPath):
 
     caCerts = {}
     for child in directoryPath.children():
-        if not child.basename().split('.')[-1].lower() == 'pem':
+        if child.basename().split('.')[-1].lower() != 'pem':
             continue
         try:
             data = child.getContent()

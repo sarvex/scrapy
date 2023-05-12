@@ -191,8 +191,7 @@ def _callAppFunction(function):
     try:
         function()
     except:
-        log.err(None, "Unexpected exception from %s" % (
-                fullyQualifiedName(function),))
+        log.err(None, f"Unexpected exception from {fullyQualifiedName(function)}")
 
 
 
@@ -455,10 +454,9 @@ class HTTPClientParser(HTTPParser):
             self.response.length = 0
             self._finished(self.clearLineBuffer())
         else:
-            transferEncodingHeaders = self.connHeaders.getRawHeaders(
-                'transfer-encoding')
-            if transferEncodingHeaders:
-
+            if transferEncodingHeaders := self.connHeaders.getRawHeaders(
+                'transfer-encoding'
+            ):
                 # This could be a KeyError.  However, that would mean we do not
                 # know how to decode the response body, so failing the request
                 # is as good a behavior as any.  Perhaps someday we will want
@@ -466,11 +464,6 @@ class HTTPClientParser(HTTPParser):
                 # seems fine to me for now.
                 transferDecoder = self._transferDecoders[transferEncodingHeaders[0].lower()]
 
-                # If anyone ever invents a transfer encoding other than
-                # chunked (yea right), and that transfer encoding can predict
-                # the length of the response body, it might be sensible to
-                # allow the transfer decoder to set the response object's
-                # length attribute.
             else:
                 contentLengthHeaders = self.connHeaders.getRawHeaders('content-length')
                 if contentLengthHeaders is None:
@@ -582,9 +575,7 @@ class Request:
         # In the future, having the protocol version be a parameter to this
         # method would probably be good.  It would be nice if this method
         # weren't limited to issuing HTTP/1.1 requests.
-        requestLines = []
-        requestLines.append(
-            '%s %s HTTP/1.1\r\n' % (self.method, self.uri))
+        requestLines = ['%s %s HTTP/1.1\r\n' % (self.method, self.uri)]
         if not self.persistent:
             requestLines.append('Connection: close\r\n')
         if TEorCL is not None:
@@ -742,13 +733,13 @@ class Request:
             there is any problem generating the request bytes.
         """
         if self.bodyProducer is not None:
-            if self.bodyProducer.length is UNKNOWN_LENGTH:
-                return self._writeToChunked(transport)
-            else:
-                return self._writeToContentLength(transport)
-        else:
-            self._writeHeaders(transport, None)
-            return succeed(None)
+            return (
+                self._writeToChunked(transport)
+                if self.bodyProducer.length is UNKNOWN_LENGTH
+                else self._writeToContentLength(transport)
+            )
+        self._writeHeaders(transport, None)
+        return succeed(None)
 
 
     def stopWriting(self):
@@ -856,11 +847,12 @@ def makeStatefulDispatcher(name, template):
     @return: The dispatcher function.
     """
     def dispatcher(self, *args, **kwargs):
-        func = getattr(self, '_' + name + '_' + self._state, None)
+        func = getattr(self, f'_{name}_{self._state}', None)
         if func is None:
             raise RuntimeError(
                 "%r has no %s method in state %s" % (self, name, self._state))
         return func(*args, **kwargs)
+
     dispatcher.__doc__ = template.__doc__
     return dispatcher
 
@@ -1297,12 +1289,15 @@ class HTTP11ClientProtocol(Protocol):
         def cancelRequest(ign):
             # Explicitly cancel the request's deferred if it's still trying to
             # write when this request is cancelled.
-            if self._state in (
-                    'TRANSMITTING', 'TRANSMITTING_AFTER_RECEIVING_RESPONSE'):
+            if self._state in {
+                'TRANSMITTING',
+                'TRANSMITTING_AFTER_RECEIVING_RESPONSE',
+            }:
                 _requestDeferred.cancel()
             else:
                 self.transport.abortConnection()
                 self._disconnectParser(Failure(CancelledError()))
+
         self._finishedRequest = Deferred(cancelRequest)
 
         # Keep track of the Request object in case we need to call stopWriting

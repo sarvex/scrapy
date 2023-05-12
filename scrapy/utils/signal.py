@@ -27,8 +27,7 @@ def send_catch_log(signal=Any, sender=Anonymous, *arguments, **named):
             result = Failure()
         except Exception:
             result = Failure()
-            log.err(result, "Error caught on signal handler: %s" % receiver, \
-                spider=spider)
+            log.err(result, f"Error caught on signal handler: {receiver}", spider=spider)
         else:
             result = response
         responses.append((receiver, result))
@@ -41,8 +40,7 @@ def send_catch_log_deferred(signal=Any, sender=Anonymous, *arguments, **named):
     """
     def logerror(failure, recv):
         if dont_log is None or not isinstance(failure.value, dont_log):
-            log.err(failure, "Error caught on signal handler: %s" % recv, \
-                spider=spider)
+            log.err(failure, f"Error caught on signal handler: {recv}", spider=spider)
         return failure
 
     dont_log = named.pop('dont_log', None)

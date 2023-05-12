@@ -17,10 +17,11 @@ from scrapy.utils.python import unicode_to_str
 
 def url_is_from_any_domain(url, domains):
     """Return True if the url belongs to any of the given domains"""
-    host = parse_url(url).netloc.lower()
-
-    if host:
-        return any(((host == d.lower()) or (host.endswith('.%s' % d.lower())) for d in domains))
+    if host := parse_url(url).netloc.lower():
+        return any(
+            host == d.lower() or host.endswith(f'.{d.lower()}')
+            for d in domains
+        )
     else:
         return False
 
@@ -64,7 +65,7 @@ def canonicalize_url(url, keep_blank_values=True, keep_fragments=False,
 
 def _unquotepath(path):
     for reserved in ('2f', '2F', '3f', '3F'):
-        path = path.replace('%' + reserved, '%25' + reserved.upper())
+        path = path.replace(f'%{reserved}', f'%25{reserved.upper()}')
     return urllib.unquote(path)
 
 

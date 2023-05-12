@@ -48,8 +48,7 @@ class Scheduler(object):
         if not request.dont_filter and self.df.request_seen(request):
             self.df.log(request, self.spider)
             return False
-        dqok = self._dqpush(request)
-        if dqok:
+        if dqok := self._dqpush(request):
             self.stats.inc_value('scheduler/enqueued/disk', spider=self.spider)
         else:
             self._mqpush(request)
@@ -92,15 +91,14 @@ class Scheduler(object):
 
     def _dqpop(self):
         if self.dqs:
-            d = self.dqs.pop()
-            if d:
+            if d := self.dqs.pop():
                 return request_from_dict(d, self.spider)
 
     def _newmq(self, priority):
         return self.mqclass()
 
     def _newdq(self, priority):
-        return self.dqclass(join(self.dqdir, 'p%s' % priority))
+        return self.dqclass(join(self.dqdir, f'p{priority}'))
 
     def _dq(self):
         activef = join(self.dqdir, 'active.json')

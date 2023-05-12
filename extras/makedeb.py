@@ -7,7 +7,7 @@ def build(suffix):
         s = open(ifn).read()
         s = s.replace('SUFFIX', suffix)
         pre, suf = ifn.split('.', 1)
-        ofn = "%s-%s.%s" % (pre, suffix, suf)
+        ofn = f"{pre}-{suffix}.{suf}"
         with open(ofn, 'w') as of:
             of.write(s)
 
@@ -22,7 +22,7 @@ def build(suffix):
     check_call('debuild -us -uc -b', shell=True)
 
 def clean(suffix):
-    for f in glob.glob("debian/python-scrapy%s*" % suffix):
+    for f in glob.glob(f"debian/python-scrapy{suffix}*"):
         if os.path.isdir(f):
             shutil.rmtree(f)
         else:

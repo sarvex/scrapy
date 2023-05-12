@@ -89,7 +89,7 @@ class Command(ScrapyCommand):
 
         if opts.build_egg: # build egg only
             egg, tmpdir = _build_egg()
-            _log("Writing egg to %s" % opts.build_egg)
+            _log(f"Writing egg to {opts.build_egg}")
             shutil.copyfile(egg, opts.build_egg)
         else: # buld egg and deploy
             target_name = _get_target_name(args)
@@ -97,17 +97,17 @@ class Command(ScrapyCommand):
             project = _get_project(target, opts)
             version = _get_version(target, opts)
             if opts.egg:
-                _log("Using egg: %s" % opts.egg)
+                _log(f"Using egg: {opts.egg}")
                 egg = opts.egg
             else:
-                _log("Packing version %s" % version)
+                _log(f"Packing version {version}")
                 egg, tmpdir = _build_egg()
             if not _upload_egg(target, egg, project, version):
                 self.exitcode = 1
 
         if tmpdir:
             if opts.debug:
-                _log("Output dir not removed: %s" % tmpdir)
+                _log(f"Output dir not removed: {tmpdir}")
             else:
                 shutil.rmtree(tmpdir)
 
@@ -116,17 +116,17 @@ def _log(message):
 
 def _get_target_name(args):
     if len(args) > 1:
-        raise UsageError("Too many arguments: %s" % ' '.join(args))
+        raise UsageError(f"Too many arguments: {' '.join(args)}")
     elif args:
         return args[0]
     elif len(args) < 1:
         return 'default'
 
 def _get_project(target, opts):
-    project = opts.project or target.get('project')
-    if not project:
+    if project := opts.project or target.get('project'):
+        return project
+    else:
         raise UsageError("Missing project")
-    return project
 
 def _get_option(section, option, default=None):
     cfg = get_config()
@@ -142,7 +142,7 @@ def _get_targets():
     for x in cfg.sections():
         if x.startswith('deploy:'):
             t = baset.copy()
-            t.update(cfg.items(x))
+            t |= cfg.items(x)
             targets[x[7:]] = t
     return targets
 
@@ -150,7 +150,7 @@ def _get_target(name):
     try:
         return _get_targets()[name]
     except KeyError:
-        raise UsageError("Unknown target: %s" % name)
+        raise UsageError(f"Unknown target: {name}")
 
 def _url(target, action):
     return urljoin(target['url'], action)
@@ -159,16 +159,16 @@ def _get_version(target, opts):
     version = opts.version or target.get('version')
     if version == 'HG':
         p = Popen(['hg', 'tip', '--template', '{rev}'], stdout=PIPE)
-        d = 'r%s' % p.communicate()[0]
+        d = f'r{p.communicate()[0]}'
         p = Popen(['hg', 'branch'], stdout=PIPE)
         b = p.communicate()[0].strip('\n')
-        return '%s-%s' % (d, b)
+        return f'{d}-{b}'
     elif version == 'GIT':
         p = Popen(['git', 'describe', '--always'], stdout=PIPE)
         d = p.communicate()[0].strip('\n')
         p = Popen(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], stdout=PIPE)
         b = p.communicate()[0].strip('\n')
-        return '%s-%s' % (d, b)
+        return f'{d}-{b}'
     elif version:
         return version
     else:
@@ -185,12 +185,12 @@ def _upload_egg(target, eggpath, project, version):
     body, boundary = encode_multipart(data)
     url = _url(target, 'addversion.json')
     headers = {
-        'Content-Type': 'multipart/form-data; boundary=%s' % boundary,
+        'Content-Type': f'multipart/form-data; boundary={boundary}',
         'Content-Length': str(len(body)),
     }
     req = urllib2.Request(url, body, headers)
     _add_auth_header(req, target)
-    _log('Deploying to project "%s" in %s' % (project, url))
+    _log(f'Deploying to project "{project}" in {url}')
     return _http_post(req)
 
 def _add_auth_header(request, target):
@@ -208,14 +208,14 @@ def _add_auth_header(request, target):
 def _http_post(request):
     try:
         f = urllib2.urlopen(request)
-        _log("Server response (%s):" % f.code)
+        _log(f"Server response ({f.code}):")
         print(f.read())
         return True
     except urllib2.HTTPError as e:
-        _log("Deploy failed (%s):" % e.code)
+        _log(f"Deploy failed ({e.code}):")
         print(e.read())
     except urllib2.URLError as e:
-        _log("Deploy failed: %s" % e)
+        _log(f"Deploy failed: {e}")
 
 def _build_egg():
     closest = closest_scrapy_cfg()
@@ -224,10 +224,9 @@ def _build_egg():
         settings = get_config().get('settings', 'default')
         _create_default_setup_py(settings=settings)
     d = tempfile.mkdtemp(prefix="scrapydeploy-")
-    o = open(os.path.join(d, "stdout"), "wb")
-    e = open(os.path.join(d, "stderr"), "wb")
-    retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d], stdout=o, stderr=e)
-    o.close()
+    with open(os.path.join(d, "stdout"), "wb") as o:
+        e = open(os.path.join(d, "stderr"), "wb")
+        retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d], stdout=o, stderr=e)
     e.close()
     egg = glob.glob(os.path.join(d, '*.egg'))[0]
     return egg, d
@@ -248,8 +247,11 @@ class HTTPRedirectHandler(urllib2.HTTPRedirectHandler):
                                    origin_req_host=req.get_origin_req_host(),
                                    unverifiable=True)
         elif code in (302, 303):
-            newheaders = dict((k, v) for k, v in req.headers.items()
-                              if k.lower() not in ("content-length", "content-type"))
+            newheaders = {
+                k: v
+                for k, v in req.headers.items()
+                if k.lower() not in ("content-length", "content-type")
+            }
             return urllib2.Request(newurl,
                                    headers=newheaders,
                                    origin_req_host=req.get_origin_req_host(),

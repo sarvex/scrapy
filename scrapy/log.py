@@ -36,10 +36,7 @@ class ScrapyFileLogObserver(log.FileLogObserver):
         self.level = level
         self.encoding = encoding
         self.crawler = crawler
-        if crawler:
-            self.emit = self._emit_with_crawler
-        else:
-            self.emit = self._emit
+        self.emit = self._emit_with_crawler if crawler else self._emit
         log.FileLogObserver.__init__(self, f)
 
     def _emit(self, eventDict):
@@ -50,10 +47,9 @@ class ScrapyFileLogObserver(log.FileLogObserver):
         return ev
 
     def _emit_with_crawler(self, eventDict):
-        ev = self._emit(eventDict)
-        if ev:
+        if ev := self._emit(eventDict):
             level = ev['logLevel']
-            sname = 'log_count/%s' % level_names.get(level, level)
+            sname = f'log_count/{level_names.get(level, level)}'
             self.crawler.stats.inc_value(sname)
 
 def _adapt_eventdict(eventDict, log_level=INFO, encoding='utf-8',
@@ -88,25 +84,22 @@ def _adapt_eventdict(eventDict, log_level=INFO, encoding='utf-8',
         return
 
     lvlname = level_names.get(level, 'NOLEVEL')
-    message = ev.get('message')
-    if message:
+    if message := ev.get('message'):
         message = [unicode_to_str(x, encoding) for x in message]
         if prepend_level:
-            message[0] = "%s: %s" % (lvlname, message[0])
+            message[0] = f"{lvlname}: {message[0]}"
         ev['message'] = message
 
-    why = ev.get('why')
-    if why:
+    if why := ev.get('why'):
         why = unicode_to_str(why, encoding)
         if prepend_level:
-            why = "%s: %s" % (lvlname, why)
+            why = f"{lvlname}: {why}"
         ev['why'] = why
 
-    fmt = ev.get('format')
-    if fmt:
+    if fmt := ev.get('format'):
         fmt = unicode_to_str(fmt, encoding)
         if prepend_level:
-            fmt = "%s: %s" % (lvlname, fmt)
+            fmt = f"{lvlname}: {fmt}"
         ev['format'] = fmt
 
     return ev
@@ -148,11 +141,12 @@ def start_from_settings(settings, crawler=None):
             settings['LOG_ENCODING'], crawler)
 
 def scrapy_info(settings):
-    msg("Scrapy %s started (bot: %s)" % (scrapy.__version__,
-        settings['BOT_NAME']))
+    msg(f"Scrapy {scrapy.__version__} started (bot: {settings['BOT_NAME']})")
 
-    msg("Optional features available: %s" % ", ".join(scrapy.optional_features),
-        level=INFO)
+    msg(
+        f'Optional features available: {", ".join(scrapy.optional_features)}',
+        level=INFO,
+    )
 
     d = dict(overridden_settings(settings))
     msg(format="Overridden settings: %(settings)r", settings=d, level=INFO)

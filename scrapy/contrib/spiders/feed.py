@@ -60,8 +60,7 @@ class XMLFeedSpider(Spider):
 
         for selector in nodes:
             ret = iterate_spider_output(self.parse_node(response, selector))
-            for result_item in self.process_results(response, ret):
-                yield result_item
+            yield from self.process_results(response, ret)
 
     def parse(self, response):
         if not hasattr(self, 'parse_node'):
@@ -73,11 +72,11 @@ class XMLFeedSpider(Spider):
         elif self.iterator == 'xml':
             selector = Selector(response, type='xml')
             self._register_namespaces(selector)
-            nodes = selector.xpath('//%s' % self.itertag)
+            nodes = selector.xpath(f'//{self.itertag}')
         elif self.iterator == 'html':
             selector = Selector(response, type='html')
             self._register_namespaces(selector)
-            nodes = selector.xpath('//%s' % self.itertag)
+            nodes = selector.xpath(f'//{self.itertag}')
         else:
             raise NotSupported('Unsupported node iterator')
 
@@ -129,9 +128,10 @@ class CSVFeedSpider(Spider):
             if isinstance(ret, (BaseItem, Request)):
                 ret = [ret]
             if not isinstance(ret, (list, tuple)):
-                raise TypeError('You cannot return an "%s" object from a spider' % type(ret).__name__)
-            for result_item in self.process_results(response, ret):
-                yield result_item
+                raise TypeError(
+                    f'You cannot return an "{type(ret).__name__}" object from a spider'
+                )
+            yield from self.process_results(response, ret)
 
     def parse(self, response):
         if not hasattr(self, 'parse_row'):

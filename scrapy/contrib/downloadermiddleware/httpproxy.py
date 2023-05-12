@@ -22,7 +22,7 @@ class HttpProxyMiddleware(object):
         proxy_url = urlunparse((proxy_type or orig_type, hostport, '', '', '', ''))
 
         if user and password:
-            user_pass = '%s:%s' % (unquote(user), unquote(password))
+            user_pass = f'{unquote(user)}:{unquote(password)}'
             creds = base64.b64encode(user_pass).strip()
         else:
             creds = None
@@ -48,4 +48,4 @@ class HttpProxyMiddleware(object):
         creds, proxy = self.proxies[scheme]
         request.meta['proxy'] = proxy
         if creds:
-            request.headers['Proxy-Authorization'] = 'Basic ' + creds
+            request.headers['Proxy-Authorization'] = f'Basic {creds}'

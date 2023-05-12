@@ -9,6 +9,9 @@ from queuelib import queue
 
 def _serializable_queue(queue_class, serialize, deserialize):
 
+
+
+
     class SerializableQueue(queue_class):
 
         def push(self, obj):
@@ -16,9 +19,9 @@ def _serializable_queue(queue_class, serialize, deserialize):
             super(SerializableQueue, self).push(s)
 
         def pop(self):
-            s = super(SerializableQueue, self).pop()
-            if s:
+            if s := super(SerializableQueue, self).pop():
                 return deserialize(s)
+
 
     return SerializableQueue
 

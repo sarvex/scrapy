@@ -15,7 +15,7 @@ class ScrapyJSONEncoder(json.JSONEncoder):
 
     def default(self, o):
         if isinstance(o, datetime.datetime):
-            return o.strftime("%s %s" % (self.DATE_FORMAT, self.TIME_FORMAT))
+            return o.strftime(f"{self.DATE_FORMAT} {self.TIME_FORMAT}")
         elif isinstance(o, datetime.date):
             return o.strftime(self.DATE_FORMAT)
         elif isinstance(o, datetime.time):
@@ -27,9 +27,9 @@ class ScrapyJSONEncoder(json.JSONEncoder):
         elif isinstance(o, BaseItem):
             return dict(o)
         elif isinstance(o, Request):
-            return "<%s %s %s>" % (type(o).__name__, o.method, o.url)
+            return f"<{type(o).__name__} {o.method} {o.url}>"
         elif isinstance(o, Response):
-            return "<%s %s %s>" % (type(o).__name__, o.status, o.url)
+            return f"<{type(o).__name__} {o.status} {o.url}>"
         else:
             return super(ScrapyJSONEncoder, self).default(o)
 

@@ -37,7 +37,7 @@ def _st(response, st):
     elif st in ('xml', 'html'):
         return st
     else:
-        raise ValueError('Invalid type: %s' % st)
+        raise ValueError(f'Invalid type: {st}')
 
 
 def _response_from_text(text, st):
@@ -81,7 +81,7 @@ class Selector(object_ref):
         self.response = response
         self.namespaces = dict(self._default_namespaces)
         if namespaces is not None:
-            self.namespaces.update(namespaces)
+            self.namespaces |= namespaces
         self._root = _root
         self._expr = _expr
 
@@ -95,7 +95,7 @@ class Selector(object_ref):
             result = xpathev(query, namespaces=self.namespaces,
                              smart_strings=self._lxml_smart_strings)
         except etree.XPathError:
-            raise ValueError("Invalid XPath: %s" % query)
+            raise ValueError(f"Invalid XPath: {query}")
 
         if type(result) is not list:
             result = [result]

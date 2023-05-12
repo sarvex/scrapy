@@ -56,13 +56,15 @@ class RedirectMiddleware(BaseRedirectMiddleware):
             return response
 
         if request.method == 'HEAD':
-            if response.status in [301, 302, 303, 307] and 'Location' in response.headers:
-                redirected_url = urljoin(request.url, response.headers['location'])
-                redirected = request.replace(url=redirected_url)
-                return self._redirect(redirected, request, spider, response.status)
-            else:
+            if (
+                response.status not in [301, 302, 303, 307]
+                or 'Location' not in response.headers
+            ):
                 return response
 
+            redirected_url = urljoin(request.url, response.headers['location'])
+            redirected = request.replace(url=redirected_url)
+            return self._redirect(redirected, request, spider, response.status)
         if response.status in [302, 303] and 'Location' in response.headers:
             redirected_url = urljoin(request.url, response.headers['location'])
             redirected = self._redirect_request_using_get(request, redirected_url)
@@ -87,13 +89,12 @@ class MetaRefreshMiddleware(BaseRedirectMiddleware):
 
     def process_response(self, request, response, spider):
         if request.meta.get('dont_redirect', False) or request.method == 'HEAD' or \
-                not isinstance(response, HtmlResponse):
+                    not isinstance(response, HtmlResponse):
             return response
 
-        if isinstance(response, HtmlResponse):
-            interval, url = get_meta_refresh(response)
-            if url and interval < self._maxdelay:
-                redirected = self._redirect_request_using_get(request, url)
-                return self._redirect(redirected, request, spider, 'meta refresh')
+        interval, url = get_meta_refresh(response)
+        if url and interval < self._maxdelay:
+            redirected = self._redirect_request_using_get(request, url)
+            return self._redirect(redirected, request, spider, 'meta refresh')
 
         return response

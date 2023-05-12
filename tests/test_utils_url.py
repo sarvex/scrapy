@@ -27,7 +27,9 @@ class UrlUtilsTest(unittest.TestCase):
 
         url = 'javascript:%20document.orderform_2581_1190810811.mode.value=%27add%27;%20javascript:%20document.orderform_2581_1190810811.submit%28%29'
         self.assertFalse(url_is_from_any_domain(url, ['testdomain.com']))
-        self.assertFalse(url_is_from_any_domain(url+'.testdomain.com', ['testdomain.com']))
+        self.assertFalse(
+            url_is_from_any_domain(f'{url}.testdomain.com', ['testdomain.com'])
+        )
 
     def test_url_is_from_spider(self):
         spider = Spider(name='example.com')
@@ -53,7 +55,9 @@ class UrlUtilsTest(unittest.TestCase):
         self.assertTrue(url_is_from_spider('http://www.example.net/some/page.html', spider))
         self.assertFalse(url_is_from_spider('http://www.example.us/some/page.html', spider))
 
-        spider = Spider(name='example.com', allowed_domains=set(('example.com', 'example.net')))
+        spider = Spider(
+            name='example.com', allowed_domains={'example.com', 'example.net'}
+        )
         self.assertTrue(url_is_from_spider('http://www.example.com/some/page.html', spider))
 
         spider = Spider(name='example.com', allowed_domains=('example.com', 'example.net'))

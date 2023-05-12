@@ -11,7 +11,7 @@ class CustomItem(Item):
     name = Field()
 
     def __str__(self):
-        return "name: %s" % self['name']
+        return f"name: {self['name']}"
 
 
 class LoggingContribTest(unittest.TestCase):

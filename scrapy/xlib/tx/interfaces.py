@@ -56,7 +56,7 @@ class IConnector(Interface):
 
 
 class IResolverSimple(Interface):
-    def getHostByName(name, timeout = (1, 3, 11, 45)):
+    def getHostByName(self, timeout = (1, 3, 11, 45)):
         """
         Resolve the domain name C{name} into an IP address.
 
@@ -101,7 +101,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupAddress(name, timeout=None):
+    def lookupAddress(self, timeout=None):
         """
         Perform an A record lookup.
 
@@ -123,7 +123,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupAddress6(name, timeout=None):
+    def lookupAddress6(self, timeout=None):
         """
         Perform an A6 record lookup.
 
@@ -145,7 +145,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupIPV6Address(name, timeout=None):
+    def lookupIPV6Address(self, timeout=None):
         """
         Perform an AAAA record lookup.
 
@@ -167,7 +167,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupMailExchange(name, timeout=None):
+    def lookupMailExchange(self, timeout=None):
         """
         Perform an MX record lookup.
 
@@ -189,7 +189,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupNameservers(name, timeout=None):
+    def lookupNameservers(self, timeout=None):
         """
         Perform an NS record lookup.
 
@@ -211,7 +211,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupCanonicalName(name, timeout=None):
+    def lookupCanonicalName(self, timeout=None):
         """
         Perform a CNAME record lookup.
 
@@ -233,7 +233,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupMailBox(name, timeout=None):
+    def lookupMailBox(self, timeout=None):
         """
         Perform an MB record lookup.
 
@@ -255,7 +255,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupMailGroup(name, timeout=None):
+    def lookupMailGroup(self, timeout=None):
         """
         Perform an MG record lookup.
 
@@ -277,7 +277,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupMailRename(name, timeout=None):
+    def lookupMailRename(self, timeout=None):
         """
         Perform an MR record lookup.
 
@@ -299,7 +299,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupPointer(name, timeout=None):
+    def lookupPointer(self, timeout=None):
         """
         Perform a PTR record lookup.
 
@@ -321,7 +321,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupAuthority(name, timeout=None):
+    def lookupAuthority(self, timeout=None):
         """
         Perform an SOA record lookup.
 
@@ -343,7 +343,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupNull(name, timeout=None):
+    def lookupNull(self, timeout=None):
         """
         Perform a NULL record lookup.
 
@@ -365,7 +365,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupWellKnownServices(name, timeout=None):
+    def lookupWellKnownServices(self, timeout=None):
         """
         Perform a WKS record lookup.
 
@@ -387,7 +387,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupHostInfo(name, timeout=None):
+    def lookupHostInfo(self, timeout=None):
         """
         Perform a HINFO record lookup.
 
@@ -409,7 +409,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupMailboxInfo(name, timeout=None):
+    def lookupMailboxInfo(self, timeout=None):
         """
         Perform an MINFO record lookup.
 
@@ -431,7 +431,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupText(name, timeout=None):
+    def lookupText(self, timeout=None):
         """
         Perform a TXT record lookup.
 
@@ -453,7 +453,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupResponsibility(name, timeout=None):
+    def lookupResponsibility(self, timeout=None):
         """
         Perform an RP record lookup.
 
@@ -475,7 +475,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupAFSDatabase(name, timeout=None):
+    def lookupAFSDatabase(self, timeout=None):
         """
         Perform an AFSDB record lookup.
 
@@ -497,7 +497,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupService(name, timeout=None):
+    def lookupService(self, timeout=None):
         """
         Perform an SRV record lookup.
 
@@ -519,7 +519,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupAllRecords(name, timeout=None):
+    def lookupAllRecords(self, timeout=None):
         """
         Perform an ALL_RECORD lookup.
 
@@ -541,7 +541,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupSenderPolicy(name, timeout= 10):
+    def lookupSenderPolicy(self, timeout= 10):
         """
         Perform a SPF record lookup.
 
@@ -563,7 +563,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupNamingAuthorityPointer(name, timeout=None):
+    def lookupNamingAuthorityPointer(self, timeout=None):
         """
         Perform a NAPTR record lookup.
 
@@ -585,7 +585,7 @@ class IResolver(IResolverSimple):
         """
 
 
-    def lookupZone(name, timeout=None):
+    def lookupZone(self, timeout=None):
         """
         Perform an AXFR record lookup.
 
@@ -617,7 +617,7 @@ class IResolver(IResolverSimple):
 
 class IReactorTCP(Interface):
 
-    def listenTCP(port, factory, backlog=50, interface=''):
+    def listenTCP(self, factory, backlog=50, interface=''):
         """
         Connects a given protocol factory to the given numeric TCP/IP port.
 
@@ -639,7 +639,7 @@ class IReactorTCP(Interface):
                                   cannot bind to the required port number)
         """
 
-    def connectTCP(host, port, factory, timeout=30, bindAddress=None):
+    def connectTCP(self, port, factory, timeout=30, bindAddress=None):
         """
         Connect a TCP client.
 
@@ -664,7 +664,7 @@ class IReactorTCP(Interface):
 
 class IReactorSSL(Interface):
 
-    def connectSSL(host, port, factory, contextFactory, timeout=30, bindAddress=None):
+    def connectSSL(self, port, factory, contextFactory, timeout=30, bindAddress=None):
         """
         Connect a client Protocol to a remote SSL socket.
 
@@ -685,7 +685,7 @@ class IReactorSSL(Interface):
         @return: An object which provides L{IConnector}.
         """
 
-    def listenSSL(port, factory, contextFactory, backlog=50, interface=''):
+    def listenSSL(self, factory, contextFactory, backlog=50, interface=''):
         """
         Connects a given protocol factory to the given numeric TCP/IP port.
         The connection is a SSL one, using contexts created by the context
@@ -709,7 +709,7 @@ class IReactorUNIX(Interface):
     UNIX socket methods.
     """
 
-    def connectUNIX(address, factory, timeout=30, checkPID=0):
+    def connectUNIX(self, factory, timeout=30, checkPID=0):
         """
         Connect a client protocol to a UNIX socket.
 
@@ -728,7 +728,7 @@ class IReactorUNIX(Interface):
         """
 
 
-    def listenUNIX(address, factory, backlog=50, mode=0o666, wantPID=0):
+    def listenUNIX(self, factory, backlog=50, mode=0o666, wantPID=0):
         """
         Listen on a UNIX socket.
 
@@ -756,7 +756,7 @@ class IReactorUNIXDatagram(Interface):
     Datagram UNIX socket methods.
     """
 
-    def connectUNIXDatagram(address, protocol, maxPacketSize=8192, mode=0o666, bindAddress=None):
+    def connectUNIXDatagram(self, protocol, maxPacketSize=8192, mode=0o666, bindAddress=None):
         """
         Connect a client protocol to a datagram UNIX socket.
 
@@ -777,7 +777,7 @@ class IReactorUNIXDatagram(Interface):
         """
 
 
-    def listenUNIXDatagram(address, protocol, maxPacketSize=8192, mode=0o666):
+    def listenUNIXDatagram(self, protocol, maxPacketSize=8192, mode=0o666):
         """
         Listen on a datagram UNIX socket.
 
@@ -804,7 +804,7 @@ class IReactorWin32Events(Interface):
     @since: 10.2
     """
 
-    def addEvent(event, fd, action):
+    def addEvent(self, fd, action):
         """
         Add a new win32 event to the event loop.
 
@@ -819,7 +819,7 @@ class IReactorWin32Events(Interface):
         """
 
 
-    def removeEvent(event):
+    def removeEvent(self):
         """
         Remove an event.
 
@@ -835,7 +835,7 @@ class IReactorUDP(Interface):
     UDP socket methods.
     """
 
-    def listenUDP(port, protocol, interface='', maxPacketSize=8192):
+    def listenUDP(self, protocol, interface='', maxPacketSize=8192):
         """
         Connects a given DatagramProtocol to the given numeric UDP port.
 
@@ -852,8 +852,7 @@ class IReactorMulticast(Interface):
     without backwards compatibility. Suggestions are welcome.
     """
 
-    def listenMulticast(port, protocol, interface='', maxPacketSize=8192,
-                        listenMultiple=False):
+    def listenMulticast(self, protocol, interface='', maxPacketSize=8192, listenMultiple=False):
         """
         Connects a given
         L{DatagramProtocol<twisted.internet.protocol.DatagramProtocol>} to the
@@ -908,7 +907,7 @@ class IReactorSocket(Interface):
         - U{http://twistedmatrix.com/trac/ticket/5574}: SOCK_DGRAM sockets
     """
 
-    def adoptStreamPort(fileDescriptor, addressFamily, factory):
+    def adoptStreamPort(self, addressFamily, factory):
         """
         Add an existing listening I{SOCK_STREAM} socket to the reactor to
         monitor for new connections to accept and handle.
@@ -938,7 +937,7 @@ class IReactorSocket(Interface):
         """
 
 
-    def adoptStreamConnection(fileDescriptor, addressFamily, factory):
+    def adoptStreamConnection(self, addressFamily, factory):
         """
         Add an existing connected I{SOCK_STREAM} socket to the reactor to
         monitor for data.
@@ -973,8 +972,7 @@ class IReactorSocket(Interface):
 
 class IReactorProcess(Interface):
 
-    def spawnProcess(processProtocol, executable, args=(), env={}, path=None,
-                     uid=None, gid=None, usePTY=0, childFDs=None):
+    def spawnProcess(self, executable, args=(), env={}, path=None, uid=None, gid=None, usePTY=0, childFDs=None):
         """
         Spawn a process, with a process protocol.
 
@@ -1070,7 +1068,7 @@ class IReactorTime(Interface):
         """
 
 
-    def callLater(delay, callable, *args, **kw):
+    def callLater(self, callable, *args, **kw):
         """
         Call a function later.
 
@@ -1125,7 +1123,7 @@ class IDelayedCall(Interface):
             been cancelled.
         """
 
-    def delay(secondsLater):
+    def delay(self):
         """
         Delay the scheduled call.
 
@@ -1137,7 +1135,7 @@ class IDelayedCall(Interface):
             been cancelled.
         """
 
-    def reset(secondsFromNow):
+    def reset(self):
         """
         Reset the scheduled call's timer.
 
@@ -1173,13 +1171,13 @@ class IReactorThreads(Interface):
         """
 
 
-    def callInThread(callable, *args, **kwargs):
+    def callInThread(self, *args, **kwargs):
         """
         Run the callable object in a separate thread.
         """
 
 
-    def callFromThread(callable, *args, **kw):
+    def callFromThread(self, *args, **kw):
         """
         Cause a function to be executed by the reactor thread.
 
@@ -1195,7 +1193,7 @@ class IReactorThreads(Interface):
         """
 
 
-    def suggestThreadPoolSize(size):
+    def suggestThreadPoolSize(self):
         """
         Suggest the size of the internal threadpool used to dispatch functions
         passed to L{callInThread}.
@@ -1212,7 +1210,7 @@ class IReactorCore(Interface):
         "I{during shutdown} and C{False} the rest of the time.")
 
 
-    def resolve(name, timeout=10):
+    def resolve(self, timeout=10):
         """
         Return a L{twisted.internet.defer.Deferred} that will resolve a hostname.
         """
@@ -1240,7 +1238,7 @@ class IReactorCore(Interface):
         can become wedged in a pre-shutdown call.
         """
 
-    def iterate(delay=0):
+    def iterate(self):
         """
         Run the main loop's I/O polling function for a period of time.
 
@@ -1255,7 +1253,7 @@ class IReactorCore(Interface):
         particular, you must not call it while the reactor is running.
         """
 
-    def fireSystemEvent(eventType):
+    def fireSystemEvent(self):
         """
         Fire a system-wide event.
 
@@ -1263,7 +1261,7 @@ class IReactorCore(Interface):
         'persist'.
         """
 
-    def addSystemEventTrigger(phase, eventType, callable, *args, **kw):
+    def addSystemEventTrigger(self, eventType, callable, *args, **kw):
         """
         Add a function to be called when a system event occurs.
 
@@ -1298,7 +1296,7 @@ class IReactorCore(Interface):
                  removeSystemEventTrigger.
         """
 
-    def removeSystemEventTrigger(triggerID):
+    def removeSystemEventTrigger(self):
         """
         Removes a trigger added with addSystemEventTrigger.
 
@@ -1314,7 +1312,7 @@ class IReactorCore(Interface):
             C{triggerID}.
         """
 
-    def callWhenRunning(callable, *args, **kw):
+    def callWhenRunning(self, *args, **kw):
         """
         Call a function when the reactor is running.
 
@@ -1338,7 +1336,7 @@ class IReactorPluggableResolver(Interface):
     A reactor with a pluggable name resolver interface.
     """
 
-    def installResolver(resolver):
+    def installResolver(self):
         """
         Set the internal resolver to use to for name lookups.
 
@@ -1388,7 +1386,7 @@ class IReactorFDSet(Interface):
     (or at least similarly opaque IDs returned from a .fileno() method)
     """
 
-    def addReader(reader):
+    def addReader(self):
         """
         I add reader to the set of file descriptors to get read events for.
 
@@ -1399,7 +1397,7 @@ class IReactorFDSet(Interface):
         @return: C{None}.
         """
 
-    def addWriter(writer):
+    def addWriter(self):
         """
         I add writer to the set of file descriptors to get write events for.
 
@@ -1410,14 +1408,14 @@ class IReactorFDSet(Interface):
         @return: C{None}.
         """
 
-    def removeReader(reader):
+    def removeReader(self):
         """
         Removes an object previously added with L{addReader}.
 
         @return: C{None}.
         """
 
-    def removeWriter(writer):
+    def removeWriter(self):
         """
         Removes an object previously added with L{addWriter}.
 
@@ -1515,7 +1513,7 @@ class IFileDescriptor(ILoggingContext):
         """
 
 
-    def connectionLost(reason):
+    def connectionLost(self):
         """
         Called when the connection was lost.
 
@@ -1580,12 +1578,12 @@ class IHalfCloseableDescriptor(Interface):
     A descriptor that can be half-closed.
     """
 
-    def writeConnectionLost(reason):
+    def writeConnectionLost(self):
         """
         Indicates write connection was lost.
         """
 
-    def readConnectionLost(reason):
+    def readConnectionLost(self):
         """
         Indicates read connection was lost.
         """
@@ -1614,7 +1612,7 @@ class IConsumer(Interface):
     A consumer consumes data from a producer.
     """
 
-    def registerProducer(producer, streaming):
+    def registerProducer(self, streaming):
         """
         Register to receive data from a producer.
 
@@ -1648,7 +1646,7 @@ class IConsumer(Interface):
         """
 
 
-    def write(data):
+    def write(self):
         """
         The producer will write data by calling this method.
 
@@ -1719,7 +1717,7 @@ class IPullProducer(IProducer):
 
 class IProtocol(Interface):
 
-    def dataReceived(data):
+    def dataReceived(self):
         """
         Called whenever data is received.
 
@@ -1734,7 +1732,7 @@ class IProtocol(Interface):
             differing chunk sizes, down to one byte at a time.
         """
 
-    def connectionLost(reason):
+    def connectionLost(self):
         """
         Called when the connection is shut down.
 
@@ -1747,7 +1745,7 @@ class IProtocol(Interface):
         @type reason: L{twisted.python.failure.Failure}
         """
 
-    def makeConnection(transport):
+    def makeConnection(self):
         """
         Make a connection to a transport and a server.
         """
@@ -1770,7 +1768,7 @@ class IProcessProtocol(Interface):
     Interface for process-related event handlers.
     """
 
-    def makeConnection(process):
+    def makeConnection(self):
         """
         Called when the process has been created.
 
@@ -1780,7 +1778,7 @@ class IProcessProtocol(Interface):
         """
 
 
-    def childDataReceived(childFD, data):
+    def childDataReceived(self, data):
         """
         Called when data arrives from the child process.
 
@@ -1793,7 +1791,7 @@ class IProcessProtocol(Interface):
         """
 
 
-    def childConnectionLost(childFD):
+    def childConnectionLost(self):
         """
         Called when a file descriptor associated with the child process is
         closed.
@@ -1803,7 +1801,7 @@ class IProcessProtocol(Interface):
         """
 
 
-    def processExited(reason):
+    def processExited(self):
         """
         Called when the child process exits.
 
@@ -1817,7 +1815,7 @@ class IProcessProtocol(Interface):
         """
 
 
-    def processEnded(reason):
+    def processEnded(self):
         """
         Called when the child process exits and all file descriptors associated
         with it have been closed.
@@ -1873,7 +1871,7 @@ class IFileDescriptorReceiver(Interface):
     L{IUNIXTransport}, which allows file descriptors to be sent between
     processes on a single host.
     """
-    def fileDescriptorReceived(descriptor):
+    def fileDescriptorReceived(self):
         """
         Called when a file descriptor is received over the connection.
 
@@ -1890,7 +1888,7 @@ class IProtocolFactory(Interface):
     Interface for protocol factories.
     """
 
-    def buildProtocol(addr):
+    def buildProtocol(self):
         """
         Called when a connection has been established to addr.
 
@@ -1928,7 +1926,7 @@ class ITransport(Interface):
     indeterminate time.
     """
 
-    def write(data):
+    def write(self):
         """
         Write some data to the physical connection, in sequence, in a
         non-blocking fashion.
@@ -1938,7 +1936,7 @@ class ITransport(Interface):
         before it all gets through.
         """
 
-    def writeSequence(data):
+    def writeSequence(self):
         """
         Write a list of strings to the physical connection.
 
@@ -2010,7 +2008,7 @@ class ITCPTransport(ITransport):
         Return if C{TCP_NODELAY} is enabled.
         """
 
-    def setTcpNoDelay(enabled):
+    def setTcpNoDelay(self):
         """
         Enable/disable C{TCP_NODELAY}.
 
@@ -2023,7 +2021,7 @@ class ITCPTransport(ITransport):
         Return if C{SO_KEEPALIVE} is enabled.
         """
 
-    def setTcpKeepAlive(enabled):
+    def setTcpKeepAlive(self):
         """
         Enable/disable C{SO_KEEPALIVE}.
 
@@ -2048,7 +2046,7 @@ class IUNIXTransport(ITransport):
     """
     Transport for stream-oriented unix domain connections.
     """
-    def sendFileDescriptor(descriptor):
+    def sendFileDescriptor(self):
         """
         Send a duplicate of this (file, socket, pipe, etc) descriptor to the
         other end of this connection.
@@ -2078,7 +2076,7 @@ class ITLSTransport(ITCPTransport):
     Once TLS mode is started the transport will implement L{ISSLTransport}.
     """
 
-    def startTLS(contextFactory):
+    def startTLS(self):
         """
         Initiate TLS negotiation.
 
@@ -2122,13 +2120,13 @@ class IProcessTransport(ITransport):
         Close stderr.
         """
 
-    def closeChildFD(descriptor):
+    def closeChildFD(self):
         """
         Close a file descriptor which is connected to the child process, identified
         by its FD in the child process.
         """
 
-    def writeToChild(childFD, data):
+    def writeToChild(self, data):
         """
         Similar to L{ITransport.write} but also allows the file descriptor in
         the child process which will receive the bytes to be specified.
@@ -2151,7 +2149,7 @@ class IProcessTransport(ITransport):
         Close stdin, stderr and stdout.
         """
 
-    def signalProcess(signalID):
+    def signalProcess(self):
         """
         Send a signal to the process.
 
@@ -2175,19 +2173,19 @@ class IServiceCollection(Interface):
     An object which provides access to a collection of services.
     """
 
-    def getServiceNamed(serviceName):
+    def getServiceNamed(self):
         """
         Retrieve the named service from this application.
 
         Raise a C{KeyError} if there is no such service name.
         """
 
-    def addService(service):
+    def addService(self):
         """
         Add a service to this collection.
         """
 
-    def removeService(service):
+    def removeService(self):
         """
         Remove a service from this collection.
         """
@@ -2198,7 +2196,7 @@ class IUDPTransport(Interface):
     Transport for UDP DatagramProtocols.
     """
 
-    def write(packet, addr=None):
+    def write(self, addr=None):
         """
         Write packet to given address.
 
@@ -2210,7 +2208,7 @@ class IUDPTransport(Interface):
         long.
         """
 
-    def connect(host, port):
+    def connect(self, port):
         """
         Connect the transport to an address.
 
@@ -2243,7 +2241,7 @@ class IUNIXDatagramTransport(Interface):
     Transport for UDP PacketProtocols.
     """
 
-    def write(packet, address):
+    def write(self, address):
         """
         Write packet to given address.
         """
@@ -2259,7 +2257,7 @@ class IUNIXDatagramConnectedTransport(Interface):
     Transport for UDP ConnectedPacketProtocols.
     """
 
-    def write(packet):
+    def write(self):
         """
         Write packet to address we are connected to.
         """
@@ -2285,7 +2283,7 @@ class IMulticastTransport(Interface):
         Return interface of outgoing multicast packets.
         """
 
-    def setOutgoingInterface(addr):
+    def setOutgoingInterface(self):
         """
         Set interface for outgoing multicast packets.
 
@@ -2297,7 +2295,7 @@ class IMulticastTransport(Interface):
         Return if loopback mode is enabled.
         """
 
-    def setLoopbackMode(mode):
+    def setLoopbackMode(self):
         """
         Set if loopback mode is enabled.
         """
@@ -2307,12 +2305,12 @@ class IMulticastTransport(Interface):
         Get time to live for multicast packets.
         """
 
-    def setTTL(ttl):
+    def setTTL(self):
         """
         Set time to live on multicast packets.
         """
 
-    def joinGroup(addr, interface=""):
+    def joinGroup(self, interface=""):
         """
         Join a multicast group. Returns L{Deferred} of success or failure.
 
@@ -2320,7 +2318,7 @@ class IMulticastTransport(Interface):
         L{error.MulticastJoinError}.
         """
 
-    def leaveGroup(addr, interface=""):
+    def leaveGroup(self, interface=""):
         """
         Leave multicast group, return L{Deferred} of success.
         """
@@ -2334,7 +2332,7 @@ class IStreamClientEndpoint(Interface):
     @since: 10.1
     """
 
-    def connect(protocolFactory):
+    def connect(self):
         """
         Connect the C{protocolFactory} to the location specified by this
         L{IStreamClientEndpoint} provider.
@@ -2354,7 +2352,7 @@ class IStreamServerEndpoint(Interface):
     @since: 10.1
     """
 
-    def listen(protocolFactory):
+    def listen(self):
         """
         Listen with C{protocolFactory} at the location specified by this
         L{IStreamServerEndpoint} provider.
@@ -2381,7 +2379,7 @@ class IStreamServerEndpointStringParser(Interface):
     )
 
 
-    def parseStreamServer(reactor, *args, **kwargs):
+    def parseStreamServer(self, *args, **kwargs):
         """
         Parse a stream server endpoint from a reactor and string-only arguments
         and keyword arguments.
@@ -2420,7 +2418,7 @@ class IStreamClientEndpointStringParser(Interface):
     )
 
 
-    def parseStreamClient(*args, **kwargs):
+    def parseStreamClient(self, **kwargs):
         """
         This method is invoked by L{endpoints.clientFromString}, if the type of
         endpoint matches the return value from this

@@ -31,7 +31,7 @@ class object_ref(object):
         return obj
 
 def format_live_refs(ignore=NoneType):
-    s = "Live References" + os.linesep + os.linesep
+    s = f"Live References{os.linesep}{os.linesep}"
     now = time()
     for cls, wdict in six.iteritems(live_refs):
         if not wdict:
@@ -48,9 +48,8 @@ def print_live_refs(*a, **kw):
 
 def get_oldest(class_name):
     for cls, wdict in six.iteritems(live_refs):
-        if cls.__name__ == class_name:
-            if wdict:
-                return min(six.iteritems(wdict), key=itemgetter(1))[0]
+        if cls.__name__ == class_name and wdict:
+            return min(six.iteritems(wdict), key=itemgetter(1))[0]
 
 def iter_all(class_name):
     for cls, wdict in six.iteritems(live_refs):

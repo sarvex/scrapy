@@ -102,8 +102,7 @@ class CrawlerRunner(object):
         return Crawler(spidercls, crawler_settings)
 
     def _setup_crawler_logging(self, crawler):
-        log_observer = log.start_from_crawler(crawler)
-        if log_observer:
+        if log_observer := log.start_from_crawler(crawler):
             crawler.signals.connect(log_observer.stop, signals.engine_stopped)
 
     def stop(self):

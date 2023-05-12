@@ -13,16 +13,11 @@ def safeRef(target, onDelete = None):
 		goes out of scope with the reference object, (either a
 		weakref or a BoundMethodWeakref) as argument.
 	"""
-	if hasattr(target, 'im_self'):
-		if target.im_self is not None:
-			# Turn a bound method into a BoundMethodWeakref instance.
-			# Keep track of these instances for lookup by disconnect().
-			assert hasattr(target, 'im_func'), """safeRef target %r has im_self, but no im_func, don't know how to create reference"""%( target,)
-			reference = BoundMethodWeakref(
-				target=target,
-				onDelete=onDelete
-			)
-			return reference
+	if hasattr(target, 'im_self') and target.im_self is not None:
+		# Turn a bound method into a BoundMethodWeakref instance.
+		# Keep track of these instances for lookup by disconnect().
+		assert hasattr(target, 'im_func'), """safeRef target %r has im_self, but no im_func, don't know how to create reference"""%( target,)
+		return BoundMethodWeakref(target=target, onDelete=onDelete)
 	if onDelete is not None:
 		return weakref.ref(target, onDelete)
 	else:
@@ -114,16 +109,15 @@ class BoundMethodWeakref(object):
 					try:
 						traceback.print_exc()
 					except AttributeError as err:
-						print('''Exception during saferef %s cleanup function %s: %s'''%(
-							self, function, e
-						))
+						print(f'''Exception during saferef {self} cleanup function {function}: {e}''')
+
 		self.deletionMethods = [onDelete]
 		self.key = self.calculateKey( target )
 		self.weakSelf = weakref.ref(target.im_self, remove)
 		self.weakFunc = weakref.ref(target.im_func, remove)
 		self.selfName = target.im_self.__class__.__name__
 		self.funcName = str(target.im_func.__name__)
-	def calculateKey( cls, target ):
+	def calculateKey(self, target):
 		"""Calculate the reference key for this reference
 
 		Currently this is a two-tuple of the id()'s of the
@@ -133,11 +127,7 @@ class BoundMethodWeakref(object):
 	calculateKey = classmethod( calculateKey )
 	def __str__(self):
 		"""Give a friendly representation of the object"""
-		return """%s( %s.%s )"""%(
-			self.__class__.__name__,
-			self.selfName,
-			self.funcName,
-		)
+		return f"""{self.__class__.__name__}( {self.selfName}.{self.funcName} )"""
 	__repr__ = __str__
 	def __nonzero__( self ):
 		"""Whether we are still a valid reference"""

@@ -21,14 +21,14 @@ class ScrapyXPathExpr(XPathExpr):
             if path == '*':
                 path = 'text()'
             elif path.endswith('::*/*'):
-                path = path[:-3] + 'text()'
+                path = f'{path[:-3]}text()'
             else:
                 path += '/text()'
 
         if self.attribute is not None:
             if path.endswith('::*/*'):
                 path = path[:-2]
-            path += '/@%s' % self.attribute
+            path += f'/@{self.attribute}'
 
         return path
 
@@ -47,23 +47,19 @@ class TranslatorMixin(object):
 
     def xpath_pseudo_element(self, xpath, pseudo_element):
         if isinstance(pseudo_element, FunctionalPseudoElement):
-            method = 'xpath_%s_functional_pseudo_element' % (
-                pseudo_element.name.replace('-', '_'))
-            method = _unicode_safe_getattr(self, method, None)
-            if not method:
+            method = f"xpath_{pseudo_element.name.replace('-', '_')}_functional_pseudo_element"
+            if method := _unicode_safe_getattr(self, method, None):
+                xpath = method(xpath, pseudo_element)
+            else:
                 raise ExpressionError(
-                    "The functional pseudo-element ::%s() is unknown"
-                % pseudo_element.name)
-            xpath = method(xpath, pseudo_element)
+                    f"The functional pseudo-element ::{pseudo_element.name}() is unknown"
+                )
         else:
-            method = 'xpath_%s_simple_pseudo_element' % (
-                pseudo_element.replace('-', '_'))
-            method = _unicode_safe_getattr(self, method, None)
-            if not method:
-                raise ExpressionError(
-                    "The pseudo-element ::%s is unknown"
-                    % pseudo_element)
-            xpath = method(xpath)
+            method = f"xpath_{pseudo_element.replace('-', '_')}_simple_pseudo_element"
+            if method := _unicode_safe_getattr(self, method, None):
+                xpath = method(xpath)
+            else:
+                raise ExpressionError(f"The pseudo-element ::{pseudo_element} is unknown")
         return xpath
 
     def xpath_attr_functional_pseudo_element(self, xpath, function):

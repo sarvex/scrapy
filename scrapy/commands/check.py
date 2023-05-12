@@ -34,7 +34,7 @@ class TextTestResult(_TextTestResult):
             write("OK")
 
         if infos:
-            writeln(" (%s)" % (", ".join(infos),))
+            writeln(f' ({", ".join(infos)})')
         else:
             write("\n")
 
@@ -89,7 +89,7 @@ class Command(ScrapyCommand):
                     continue
                 print(spider)
                 for method in sorted(methods):
-                    print('  * %s' % method)
+                    print(f'  * {method}')
         else:
             start = time.time()
             self.crawler_process.start()

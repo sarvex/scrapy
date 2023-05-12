@@ -51,8 +51,8 @@ class S3DownloadHandler(object):
         p = urlparse_cached(request)
         scheme = 'https' if request.meta.get('is_secure') else 'http'
         bucket = p.hostname
-        path = p.path + '?' + p.query if p.query else p.path
-        url = '%s://%s.s3.amazonaws.com%s' % (scheme, bucket, path)
+        path = f'{p.path}?{p.query}' if p.query else p.path
+        url = f'{scheme}://{bucket}.s3.amazonaws.com{path}'
         signed_headers = self.conn.make_request(
                 method=request.method,
                 bucket=bucket,

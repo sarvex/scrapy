@@ -51,9 +51,10 @@ class Command(ScrapyCommand):
 
     @property
     def max_level(self):
-        levels = self.items.keys() + self.requests.keys()
-        if levels: return max(levels)
-        else: return 0
+        if levels := self.items.keys() + self.requests.keys():
+            if levels: return max(levels)
+        else:
+            return 0
 
     def add_items(self, lvl, new_items):
         old_items = self.items.get(lvl, [])
@@ -74,8 +75,7 @@ class Command(ScrapyCommand):
 
     def print_requests(self, lvl=None, colour=True):
         if lvl is None:
-            levels = self.requests.keys()
-            if levels:
+            if levels := self.requests.keys():
                 requests = self.requests[max(levels)]
             else:
                 requests = []
@@ -206,7 +206,7 @@ class Command(ScrapyCommand):
 
     def run(self, args, opts):
         # parse arguments
-        if not len(args) == 1 or not is_url(args[0]):
+        if len(args) != 1 or not is_url(args[0]):
             raise UsageError()
         else:
             url = args[0]

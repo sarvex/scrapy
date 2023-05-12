@@ -74,5 +74,5 @@ class Command(ScrapyCommand):
         print("New Scrapy project %r created in:" % project_name)
         print("    %s\n" % abspath(project_name))
         print("You can start your first spider with:")
-        print("    cd %s" % project_name)
+        print(f"    cd {project_name}")
         print("    scrapy genspider example example.com")

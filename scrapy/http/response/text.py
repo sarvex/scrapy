@@ -25,8 +25,9 @@ class TextResponse(Response):
     def _set_url(self, url):
         if isinstance(url, unicode):
             if self.encoding is None:
-                raise TypeError('Cannot convert unicode url - %s has no encoding' %
-                    type(self).__name__)
+                raise TypeError(
+                    f'Cannot convert unicode url - {type(self).__name__} has no encoding'
+                )
             self._url = url.encode(self.encoding)
         else:
             super(TextResponse, self)._set_url(url)
@@ -35,8 +36,9 @@ class TextResponse(Response):
         self._body = ''
         if isinstance(body, unicode):
             if self.encoding is None:
-                raise TypeError('Cannot convert unicode body - %s has no encoding' %
-                    type(self).__name__)
+                raise TypeError(
+                    f'Cannot convert unicode body - {type(self).__name__} has no encoding'
+                )
             self._body = body.encode(self._encoding)
         else:
             super(TextResponse, self)._set_body(body)
@@ -55,11 +57,11 @@ class TextResponse(Response):
 
     def body_as_unicode(self):
         """Return body as unicode"""
-        # check for self.encoding before _cached_ubody just in
-        # _body_inferred_encoding is called
-        benc = self.encoding
         if self._cached_ubody is None:
-            charset = 'charset=%s' % benc
+            # check for self.encoding before _cached_ubody just in
+            # _body_inferred_encoding is called
+            benc = self.encoding
+            charset = f'charset={benc}'
             self._cached_ubody = html_to_unicode(charset, self.body)[1]
         return self._cached_ubody
 

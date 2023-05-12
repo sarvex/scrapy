@@ -101,13 +101,13 @@ class S3FilesStore(object):
 
     def _get_boto_key(self, path):
         b = self._get_boto_bucket()
-        key_name = '%s%s' % (self.prefix, path)
+        key_name = f'{self.prefix}{path}'
         return threads.deferToThread(b.get_key, key_name)
 
     def persist_file(self, path, buf, info, meta=None, headers=None):
         """Upload file to S3 storage"""
         b = self._get_boto_bucket()
-        key_name = '%s%s' % (self.prefix, path)
+        key_name = f'{self.prefix}{path}'
         k = b.new_key(key_name)
         if meta:
             for metakey, metavalue in six.iteritems(meta):
@@ -168,10 +168,7 @@ class FilesPipeline(MediaPipeline):
         return cls(store_uri)
 
     def _get_store(self, uri):
-        if os.path.isabs(uri):  # to support win32 paths like: C:\\some\dir
-            scheme = 'file'
-        else:
-            scheme = urlparse(uri).scheme
+        scheme = 'file' if os.path.isabs(uri) else urlparse(uri).scheme
         store_cls = self.STORE_SCHEMES[scheme]
         return store_cls(uri)
 
@@ -201,7 +198,7 @@ class FilesPipeline(MediaPipeline):
         path = self.file_path(request, info=info)
         dfd = defer.maybeDeferred(self.store.stat_file, path, info)
         dfd.addCallbacks(_onsuccess, lambda _: None)
-        dfd.addErrback(log.err, self.__class__.__name__ + '.store.stat_file')
+        dfd.addErrback(log.err, f'{self.__class__.__name__}.store.stat_file')
         return dfd
 
     def media_failed(self, failure, request, info):
@@ -253,7 +250,7 @@ class FilesPipeline(MediaPipeline):
 
     def inc_stats(self, spider, status):
         spider.crawler.stats.inc_value('file_count', spider=spider)
-        spider.crawler.stats.inc_value('file_status_count/%s' % status, spider=spider)
+        spider.crawler.stats.inc_value(f'file_status_count/{status}', spider=spider)
 
     ### Overridable Interface
     def get_media_requests(self, item, info):
@@ -263,8 +260,7 @@ class FilesPipeline(MediaPipeline):
         path = self.file_path(request, response=response, info=info)
         buf = BytesIO(response.body)
         self.store.persist_file(path, buf, info)
-        checksum = md5sum(buf)
-        return checksum
+        return md5sum(buf)
 
     def item_completed(self, results, item, info):
         if self.FILES_RESULT_FIELD in item.fields:
@@ -295,7 +291,7 @@ class FilesPipeline(MediaPipeline):
 
         media_guid = hashlib.sha1(url).hexdigest()  # change to request.url after deprecation
         media_ext = os.path.splitext(url)[1]  # change to request.url after deprecation
-        return 'full/%s%s' % (media_guid, media_ext)
+        return f'full/{media_guid}{media_ext}'
 
     # deprecated
     def file_key(self, url):

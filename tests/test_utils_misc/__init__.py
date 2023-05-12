@@ -23,20 +23,20 @@ class UtilsMiscTestCase(unittest.TestCase):
             'tests.test_utils_misc.test_walk_modules.mod.mod0',
             'tests.test_utils_misc.test_walk_modules.mod1',
         ]
-        self.assertEquals(set([m.__name__ for m in mods]), set(expected))
+        self.assertEquals({m.__name__ for m in mods}, set(expected))
 
         mods = walk_modules('tests.test_utils_misc.test_walk_modules.mod')
         expected = [
             'tests.test_utils_misc.test_walk_modules.mod',
             'tests.test_utils_misc.test_walk_modules.mod.mod0',
         ]
-        self.assertEquals(set([m.__name__ for m in mods]), set(expected))
+        self.assertEquals({m.__name__ for m in mods}, set(expected))
 
         mods = walk_modules('tests.test_utils_misc.test_walk_modules.mod1')
         expected = [
             'tests.test_utils_misc.test_walk_modules.mod1',
         ]
-        self.assertEquals(set([m.__name__ for m in mods]), set(expected))
+        self.assertEquals({m.__name__ for m in mods}, set(expected))
 
         self.assertRaises(ImportError, walk_modules, 'nomodule999')
 
@@ -51,11 +51,12 @@ class UtilsMiscTestCase(unittest.TestCase):
                 'testegg.spiders.b',
                 'testegg'
             ]
-            self.assertEquals(set([m.__name__ for m in mods]), set(expected))
+            self.assertEquals({m.__name__ for m in mods}, set(expected))
         finally:
             sys.path.remove(egg)
 
     def test_arg_to_iter(self):
+
 
         class TestItem(Item):
             name = Field()
@@ -64,12 +65,12 @@ class UtilsMiscTestCase(unittest.TestCase):
         assert hasattr(arg_to_iter(100), '__iter__')
         assert hasattr(arg_to_iter('lala'), '__iter__')
         assert hasattr(arg_to_iter([1, 2, 3]), '__iter__')
-        assert hasattr(arg_to_iter(l for l in 'abcd'), '__iter__')
+        assert hasattr(arg_to_iter(iter('abcd')), '__iter__')
 
         self.assertEqual(list(arg_to_iter(None)), [])
         self.assertEqual(list(arg_to_iter('lala')), ['lala'])
         self.assertEqual(list(arg_to_iter(100)), [100])
-        self.assertEqual(list(arg_to_iter(l for l in 'abc')), ['a', 'b', 'c'])
+        self.assertEqual(list(arg_to_iter(iter('abc'))), ['a', 'b', 'c'])
         self.assertEqual(list(arg_to_iter([1, 2, 3])), [1, 2, 3])
         self.assertEqual(list(arg_to_iter({'a':1})), [{'a': 1}])
         self.assertEqual(list(arg_to_iter(TestItem(name="john"))), [TestItem(name="john")])

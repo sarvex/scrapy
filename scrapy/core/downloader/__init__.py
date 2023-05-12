@@ -43,8 +43,9 @@ class Slot(object):
 def _get_concurrency_delay(concurrency, spider, settings):
     delay = settings.getfloat('DOWNLOAD_DELAY')
     if hasattr(spider, 'DOWNLOAD_DELAY'):
-        warnings.warn("%s.DOWNLOAD_DELAY attribute is deprecated, use %s.download_delay instead" %
-                      (type(spider).__name__, type(spider).__name__))
+        warnings.warn(
+            f"{type(spider).__name__}.DOWNLOAD_DELAY attribute is deprecated, use {type(spider).__name__}.download_delay instead"
+        )
         delay = spider.DOWNLOAD_DELAY
     if hasattr(spider, 'download_delay'):
         delay = spider.download_delay

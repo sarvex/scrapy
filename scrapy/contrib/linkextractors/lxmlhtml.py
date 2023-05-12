@@ -21,9 +21,12 @@ XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml"
 _collect_string_content = etree.XPath("string()")
 
 def _nons(tag):
-    if isinstance(tag, basestring):
-        if tag[0] == '{' and tag[1:len(XHTML_NAMESPACE)+1] == XHTML_NAMESPACE:
-            return tag.split('}')[-1]
+    if (
+        isinstance(tag, basestring)
+        and tag[0] == '{'
+        and tag[1 : len(XHTML_NAMESPACE) + 1] == XHTML_NAMESPACE
+    ):
+        return tag.split('}')[-1]
     return tag
 
 
@@ -57,12 +60,15 @@ class LxmlParserLinkExtractor(object):
                 url = url.encode(response_encoding)
             # to fix relative links after process_value
             url = urljoin(response_url, url)
-            link = Link(url, _collect_string_content(el) or u'',
-                nofollow=True if el.get('rel') == 'nofollow' else False)
+            link = Link(
+                url,
+                _collect_string_content(el) or u'',
+                nofollow=el.get('rel') == 'nofollow',
+            )
             links.append(link)
 
         return unique_list(links, key=lambda link: link.url) \
-                if self.unique else links
+                    if self.unique else links
 
     def extract_links(self, response):
         html = Selector(response)

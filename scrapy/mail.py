@@ -42,10 +42,7 @@ class MailSender(object):
             settings.getbool('MAIL_TLS'), settings.getbool('MAIL_SSL'))
 
     def send(self, to, subject, body, cc=None, attachs=(), mimetype='text/plain', _callback=None):
-        if attachs:
-            msg = MIMEMultipart()
-        else:
-            msg = MIMENonMultipart(*mimetype.split('/', 1))
+        msg = MIMEMultipart() if attachs else MIMENonMultipart(*mimetype.split('/', 1))
         msg['From'] = self.mailfrom
         msg['To'] = COMMASPACE.join(to)
         msg['Date'] = formatdate(localtime=True)
@@ -61,8 +58,7 @@ class MailSender(object):
                 part = MIMEBase(*mimetype.split('/'))
                 part.set_payload(f.read())
                 Encoders.encode_base64(part)
-                part.add_header('Content-Disposition', 'attachment; filename="%s"' \
-                    % attach_name)
+                part.add_header('Content-Disposition', f'attachment; filename="{attach_name}"')
                 msg.attach(part)
         else:
             msg.set_payload(body)

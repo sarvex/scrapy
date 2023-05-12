@@ -16,8 +16,10 @@ def request_to_dict(request, spider=None):
     eb = request.errback
     if callable(eb):
         eb = _find_method(spider, eb)
-    d = {
-        'url': request.url.decode('ascii'), # urls should be safe (safe_string_url)
+    return {
+        'url': request.url.decode(
+            'ascii'
+        ),  # urls should be safe (safe_string_url)
         'callback': cb,
         'errback': eb,
         'method': request.method,
@@ -29,7 +31,6 @@ def request_to_dict(request, spider=None):
         'priority': request.priority,
         'dont_filter': request.dont_filter,
     }
-    return d
 
 
 def request_from_dict(d, spider=None):
@@ -62,7 +63,7 @@ def _find_method(obj, func):
     if obj and hasattr(func, 'im_self') and func.im_self is obj:
         return func.im_func.__name__
     else:
-        raise ValueError("Function %s is not a method of: %s" % (func, obj))
+        raise ValueError(f"Function {func} is not a method of: {obj}")
 
 def _get_method(obj, name):
     name = str(name)

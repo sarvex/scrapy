@@ -16,13 +16,15 @@ class ContractsManager(object):
             self.contracts[contract.name] = contract
 
     def tested_methods_from_spidercls(self, spidercls):
-        methods = []
-        for key, value in vars(spidercls).items():
-            if (callable(value) and value.__doc__ and
-                    re.search(r'^\s*@', value.__doc__, re.MULTILINE)):
-                methods.append(key)
-
-        return methods
+        return [
+            key
+            for key, value in vars(spidercls).items()
+            if (
+                callable(value)
+                and value.__doc__
+                and re.search(r'^\s*@', value.__doc__, re.MULTILINE)
+            )
+        ]
 
     def extract_contracts(self, method):
         contracts = []
@@ -46,8 +48,7 @@ class ContractsManager(object):
         return requests
 
     def from_method(self, method, results):
-        contracts = self.extract_contracts(method)
-        if contracts:
+        if contracts := self.extract_contracts(method):
             # calculate request args
             args, kwargs = get_spec(Request.__init__)
             kwargs['callback'] = method
@@ -95,8 +96,8 @@ class Contract(object):
     """ Abstract class for contracts """
 
     def __init__(self, method, *args):
-        self.testcase_pre = _create_testcase(method, '@%s pre-hook' % self.name)
-        self.testcase_post = _create_testcase(method, '@%s post-hook' % self.name)
+        self.testcase_pre = _create_testcase(method, f'@{self.name} pre-hook')
+        self.testcase_post = _create_testcase(method, f'@{self.name} post-hook')
         self.args = args
 
     def add_pre_hook(self, request, results):
@@ -153,10 +154,13 @@ class Contract(object):
 def _create_testcase(method, desc):
     spider = method.__self__.name
 
-    class ContractTestCase(TestCase):
-        def __str__(_self):
-            return "[%s] %s (%s)" % (spider, method.__name__, desc)
 
-    name = '%s_%s' % (spider, method.__name__)
+
+    class ContractTestCase(TestCase):
+        def __str__(self):
+            return f"[{spider}] {method.__name__} ({desc})"
+
+
+    name = f'{spider}_{method.__name__}'
     setattr(ContractTestCase, name, lambda x: x)
     return ContractTestCase(name)

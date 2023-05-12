@@ -28,7 +28,7 @@ def get_engine_status(engine):
         try:
             checks += [(test, eval(test))]
         except Exception as e:
-            checks += [(test, "%s (exception)" % type(e).__name__)]
+            checks += [(test, f"{type(e).__name__} (exception)")]
 
     return checks
 

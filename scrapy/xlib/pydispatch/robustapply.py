@@ -16,18 +16,21 @@ def function(receiver):
     If fromMethod is true, then the callable already
     has its first argument bound
     """
-    if inspect.isclass(receiver) and hasattr(receiver, '__call__'):
-        # receiver is a class instance; assume it is callable.
-        # Reassign receiver to the actual method that will be called.
-        if hasattr(receiver.__call__, 'im_func') or \
-           hasattr(receiver.__call__, 'im_code'):
-            receiver = receiver.__call__
+    if (
+        inspect.isclass(receiver)
+        and hasattr(receiver, '__call__')
+        and (
+            hasattr(receiver.__call__, 'im_func')
+            or hasattr(receiver.__call__, 'im_code')
+        )
+    ):
+        receiver = receiver.__call__
 
     if hasattr( receiver, 'im_func' ):
         # an instance-method...
         return receiver, receiver.im_func.func_code, 1
     elif not hasattr(receiver, 'func_code'):
-        raise ValueError('unknown receiver type %s %s'%(receiver, type(receiver)))
+        raise ValueError(f'unknown receiver type {receiver} {type(receiver)}')
 
     return receiver, receiver.func_code, 0
 
@@ -47,7 +50,7 @@ def robustApply(receiver, *arguments, **named):
     if not (codeObject.co_flags & 8):
         # fc does not have a **kwds type parameter, therefore 
         # remove unacceptable arguments.
-        for arg in named.keys():
+        for arg in named:
             if arg not in acceptable:
                 del named[arg]
 

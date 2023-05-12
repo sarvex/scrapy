@@ -79,7 +79,7 @@ class BaseMediaPipelineTestCase(unittest.TestCase):
         txlog.removeObserver(events.append)
         self.flushLoggedErrors()
         assert new_item is item
-        assert len(events) == 0
+        assert not events
 
     @inlineCallbacks
     def test_default_process_item(self):

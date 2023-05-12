@@ -41,7 +41,7 @@ class RobotsTxtMiddleware(object):
         netloc = url.netloc
         if netloc not in self._parsers:
             self._parsers[netloc] = None
-            robotsurl = "%s://%s/robots.txt" % (url.scheme, url.netloc)
+            robotsurl = f"{url.scheme}://{url.netloc}/robots.txt"
             robotsreq = Request(
                 robotsurl,
                 priority=self.DOWNLOAD_PRIORITY,

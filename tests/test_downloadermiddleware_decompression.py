@@ -10,7 +10,7 @@ def _test_data(formats):
     uncompressed_body = get_testdata('compressed', 'feed-sample1.xml')
     test_responses = {}
     for format in formats:
-        body = get_testdata('compressed', 'feed-sample1.' + format)
+        body = get_testdata('compressed', f'feed-sample1.{format}')
         test_responses[format] = Response('http://foo.com/bar', body=body)
     return uncompressed_body, test_responses
 
@@ -28,8 +28,9 @@ class DecompressionMiddlewareTest(TestCase):
         for fmt in self.test_formats:
             rsp = self.test_responses[fmt]
             new = self.mw.process_response(None, rsp, self.spider)
-            assert isinstance(new, XmlResponse), \
-                    'Failed %s, response type %s' % (fmt, type(new).__name__)
+            assert isinstance(
+                new, XmlResponse
+            ), f'Failed {fmt}, response type {type(new).__name__}'
             assert_samelines(self, new.body, self.uncompressed_body, fmt)
 
     def test_plain_response(self):

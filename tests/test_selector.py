@@ -37,17 +37,17 @@ class SelectorTestCase(unittest.TestCase):
                          [u'12'])
 
     def test_representation_slice(self):
-        body = u"<p><input name='{}' value='\xa9'/></p>".format(50 * 'b')
+        body = f"<p><input name='{50 * 'b'}' value='\xa9'/></p>"
         response = TextResponse(url="http://example.com", body=body, encoding='utf8')
         sel = self.sscls(response)
 
         self.assertEqual(
             map(repr, sel.xpath('//input/@name')),
-            ["<Selector xpath='//input/@name' data=u'{}'>".format(40 * 'b')]
+            [f"<Selector xpath='//input/@name' data=u'{40 * 'b'}'>"],
         )
 
     def test_representation_unicode_query(self):
-        body = u"<p><input name='{}' value='\xa9'/></p>".format(50 * 'b')
+        body = f"<p><input name='{50 * 'b'}' value='\xa9'/></p>"
         response = TextResponse(url="http://example.com", body=body, encoding='utf8')
         sel = self.sscls(response)
         self.assertEqual(
@@ -225,10 +225,10 @@ class SelectorTestCase(unittest.TestCase):
         # u'\xa3'     = pound symbol in latin-1 (iso-8859-1)
 
         meta = u'<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">'
-        head = u'<head>' + meta + u'</head>'
+        head = f'<head>{meta}</head>'
         body_content = u'<span id="blank">\xa3</span>'
-        body = u'<body>' + body_content + u'</body>'
-        html = u'<html>' + head + body + u'</html>'
+        body = f'<body>{body_content}</body>'
+        html = f'<html>{head}{body}</html>'
         encoding = 'utf-8'
         html_utf8 = html.encode(encoding)
 
@@ -288,8 +288,9 @@ class SelectorTestCase(unittest.TestCase):
         """Check that classes are using slots and are weak-referenceable"""
         x = self.sscls()
         weakref.ref(x)
-        assert not hasattr(x, '__dict__'), "%s does not use __slots__" % \
-            x.__class__.__name__
+        assert not hasattr(
+            x, '__dict__'
+        ), f"{x.__class__.__name__} does not use __slots__"
 
     def test_remove_namespaces(self):
         xml = """<?xml version="1.0" encoding="UTF-8"?>

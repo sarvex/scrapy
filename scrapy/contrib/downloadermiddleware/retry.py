@@ -42,7 +42,7 @@ class RetryMiddleware(object):
         if not settings.getbool('RETRY_ENABLED'):
             raise NotConfigured
         self.max_retry_times = settings.getint('RETRY_TIMES')
-        self.retry_http_codes = set(int(x) for x in settings.getlist('RETRY_HTTP_CODES'))
+        self.retry_http_codes = {int(x) for x in settings.getlist('RETRY_HTTP_CODES')}
         self.priority_adjust = settings.getint('RETRY_PRIORITY_ADJUST')
 
     @classmethod

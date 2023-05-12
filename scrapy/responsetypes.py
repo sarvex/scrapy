@@ -45,7 +45,7 @@ class ResponseTypes(object):
         elif mimetype in self.classes:
             return self.classes[mimetype]
         else:
-            basetype = "%s/*" % mimetype.split('/')[0]
+            basetype = f"{mimetype.split('/')[0]}/*"
             return self.classes.get(basetype, Response)
 
     def from_content_type(self, content_type, content_encoding=None):
@@ -78,10 +78,7 @@ class ResponseTypes(object):
     def from_filename(self, filename):
         """Return the most appropriate Response class from a file name"""
         mimetype, encoding = self.mimetypes.guess_type(filename)
-        if mimetype and not encoding:
-            return self.from_mimetype(mimetype)
-        else:
-            return Response
+        return self.from_mimetype(mimetype) if mimetype and not encoding else Response
 
     def from_body(self, body):
         """Try to guess the appropriate response based on the body content.

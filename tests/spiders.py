@@ -55,7 +55,7 @@ class DelaySpider(MetaSpider):
 
     def start_requests(self):
         self.t1 = time.time()
-        url = "http://localhost:8998/delay?n=%s&b=%s" % (self.n, self.b)
+        url = f"http://localhost:8998/delay?n={self.n}&b={self.b}"
         yield Request(url, callback=self.parse, errback=self.errback)
 
     def parse(self, response):
@@ -130,8 +130,7 @@ class BrokenStartRequestsSpider(FollowAllSpider):
 
     def parse(self, response):
         self.seedsseen.append(response.meta.get('seed'))
-        for req in super(BrokenStartRequestsSpider, self).parse(response):
-            yield req
+        yield from super(BrokenStartRequestsSpider, self).parse(response)
 
 
 class SingleRequestSpider(MetaSpider):
@@ -167,7 +166,7 @@ class DuplicateStartRequestsSpider(Spider):
 
     def start_requests(self):
         for i in range(0, self.distinct_urls):
-            for j in range(0, self.dupe_factor):
+            for _ in range(0, self.dupe_factor):
                 url = "http://localhost:8998/echo?headers=1&body=test%d" % i
                 yield self.make_requests_from_url(url)
 

@@ -78,8 +78,7 @@ class DecompressionMiddleware(object):
             return response
 
         for fmt, func in six.iteritems(self._formats):
-            new_response = func(response)
-            if new_response:
+            if new_response := func(response):
                 log.msg(format='Decompressed response with format: %(responsefmt)s',
                         level=log.DEBUG, spider=spider, responsefmt=fmt)
                 return new_response

@@ -5,8 +5,8 @@ from twisted.python.failure import Failure
 from scrapy import log
 
 
-SCRAPEDFMT = u"Scraped from %(src)s" + os.linesep + "%(item)s"
-DROPPEDFMT = u"Dropped: %(exception)s" + os.linesep + "%(item)s"
+SCRAPEDFMT = f"Scraped from %(src)s{os.linesep}%(item)s"
+DROPPEDFMT = f"Dropped: %(exception)s{os.linesep}%(item)s"
 CRAWLEDFMT = u"Crawled (%(status)s) %(request)s (referer: %(referer)s)%(flags)s"
 
 class LogFormatter(object):
@@ -16,7 +16,7 @@ class LogFormatter(object):
     """
 
     def crawled(self, request, response, spider):
-        flags = ' %s' % str(response.flags) if response.flags else ''
+        flags = f' {str(response.flags)}' if response.flags else ''
         return {
             'level': log.DEBUG,
             'format': CRAWLEDFMT,

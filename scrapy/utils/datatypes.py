@@ -34,7 +34,7 @@ class MultiValueDict(dict):
         dict.__init__(self, key_to_list_mapping)
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, dict.__repr__(self))
+        return f"<{self.__class__.__name__}: {dict.__repr__(self)}>"
 
     def __getitem__(self, key):
         """
@@ -71,9 +71,7 @@ class MultiValueDict(dict):
             val = self[key]
         except KeyError:
             return default
-        if val == []:
-            return default
-        return val
+        return default if val == [] else val
 
     def getlist(self, key):
         "Returns an empty list if the requested data doesn't exist"
@@ -242,10 +240,9 @@ class MergeDict(object):
             return default
 
     def getlist(self, key):
-        for dict_ in self.dicts:
-            if key in dict_.keys():
-                return dict_.getlist(key)
-        return []
+        return next(
+            (dict_.getlist(key) for dict_ in self.dicts if key in dict_.keys()), []
+        )
 
     def items(self):
         item_list = []
@@ -254,10 +251,7 @@ class MergeDict(object):
         return item_list
 
     def has_key(self, key):
-        for dict_ in self.dicts:
-            if key in dict_:
-                return True
-        return False
+        return any(key in dict_ for dict_ in self.dicts)
 
     __contains__ = has_key
 

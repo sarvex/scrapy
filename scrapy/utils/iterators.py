@@ -25,14 +25,14 @@ def xmliter(obj, nodename):
     text = _body_or_str(obj)
 
     header_start = re.search(HEADER_START_RE, text)
-    header_start = header_start.group(1).strip() if header_start else ''
+    header_start = header_start[1].strip() if header_start else ''
     header_end = re_rsearch(HEADER_END_RE, text)
     header_end = text[header_end[1]:].strip() if header_end else ''
 
     r = re.compile(r"<%s[\s>].*?</%s>" % (nodename, nodename), re.DOTALL)
     for match in r.finditer(text):
         nodetext = header_start + match.group() + header_end
-        yield Selector(text=nodetext, type='xml').xpath('//' + nodename)[0]
+        yield Selector(text=nodetext, type='xml').xpath(f'//{nodename}')[0]
 
 
 def csviter(obj, delimiter=None, headers=None, encoding=None, quotechar=None):
@@ -76,8 +76,9 @@ def csviter(obj, delimiter=None, headers=None, encoding=None, quotechar=None):
 
 
 def _body_or_str(obj, unicode=True):
-    assert isinstance(obj, (Response, six.string_types)), \
-        "obj must be Response or basestring, not %s" % type(obj).__name__
+    assert isinstance(
+        obj, (Response, six.string_types)
+    ), f"obj must be Response or basestring, not {type(obj).__name__}"
     if isinstance(obj, Response):
         if not unicode:
             return obj.body

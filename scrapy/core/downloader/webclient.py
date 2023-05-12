@@ -73,9 +73,11 @@ class ScrapyHTTPPageGetter(HTTPClient):
 
     def timeout(self):
         self.transport.loseConnection()
-        self.factory.noPage(\
-                defer.TimeoutError("Getting %s took longer than %s seconds." % \
-                (self.factory.url, self.factory.timeout)))
+        self.factory.noPage(
+            defer.TimeoutError(
+                f"Getting {self.factory.url} took longer than {self.factory.timeout} seconds."
+            )
+        )
 
 
 class ScrapyHTTPClientFactory(HTTPClientFactory):
@@ -129,8 +131,7 @@ class ScrapyHTTPClientFactory(HTTPClientFactory):
     def _set_connection_attributes(self, request):
         parsed = urlparse_cached(request)
         self.scheme, self.netloc, self.host, self.port, self.path = _parsed_url_args(parsed)
-        proxy = request.meta.get('proxy')
-        if proxy:
+        if proxy := request.meta.get('proxy'):
             self.scheme, _, self.host, self.port, _ = _parse(proxy)
             self.path = self.url
 

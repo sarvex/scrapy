@@ -2,6 +2,7 @@
 Scrapy - a screen scraping framework written in Python
 """
 
+
 __all__ = ['__version__', 'version_info', 'optional_features', 'twisted_version',
            'Spider', 'Request', 'FormRequest', 'Selector', 'Item', 'Field']
 
@@ -15,7 +16,7 @@ del pkgutil
 # Check minimum required Python version
 import sys
 if sys.version_info < (2, 7):
-    print("Scrapy %s requires Python 2.7" % __version__)
+    print(f"Scrapy {__version__} requires Python 2.7")
     sys.exit(1)
 
 # Ignore noisy twisted deprecation warnings
@@ -28,9 +29,7 @@ from . import _monkeypatches
 del _monkeypatches
 
 # WARNING: optional_features set is deprecated and will be removed soon. Do not use.
-optional_features = set()
-# TODO: backwards compatibility, remove for Scrapy 0.20
-optional_features.add('ssl')
+optional_features = {'ssl'}
 try:
     import boto
     del boto

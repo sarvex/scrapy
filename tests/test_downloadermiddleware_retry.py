@@ -79,7 +79,7 @@ class RetryTest(unittest.TestCase):
             exceptions.append(ResponseFailed)
 
         for exc in exceptions:
-            req = Request('http://www.scrapytest.org/%s' % exc.__name__)
+            req = Request(f'http://www.scrapytest.org/{exc.__name__}')
             self._test_retry_exception(req, exc('foo'))
 
     def _test_retry_exception(self, req, exception):

@@ -50,13 +50,16 @@ class Request(object_ref):
             self._url = escape_ajax(safe_url_string(url))
         elif isinstance(url, six.text_type):
             if self.encoding is None:
-                raise TypeError('Cannot convert unicode url - %s has no encoding' %
-                                type(self).__name__)
+                raise TypeError(
+                    f'Cannot convert unicode url - {type(self).__name__} has no encoding'
+                )
             self._set_url(url.encode(self.encoding))
         else:
-            raise TypeError('Request url must be str or unicode, got %s:' % type(url).__name__)
+            raise TypeError(
+                f'Request url must be str or unicode, got {type(url).__name__}:'
+            )
         if ':' not in self._url:
-            raise ValueError('Missing scheme in request url: %s' % self._url)
+            raise ValueError(f'Missing scheme in request url: {self._url}')
 
     url = property(_get_url, obsolete_setter(_set_url, 'url'))
 
@@ -68,13 +71,16 @@ class Request(object_ref):
             self._body = body
         elif isinstance(body, six.text_type):
             if self.encoding is None:
-                raise TypeError('Cannot convert unicode body - %s has no encoding' %
-                                type(self).__name__)
+                raise TypeError(
+                    f'Cannot convert unicode body - {type(self).__name__} has no encoding'
+                )
             self._body = body.encode(self.encoding)
         elif body is None:
             self._body = ''
         else:
-            raise TypeError("Request body must either str or unicode. Got: '%s'" % type(body).__name__)
+            raise TypeError(
+                f"Request body must either str or unicode. Got: '{type(body).__name__}'"
+            )
 
     body = property(_get_body, obsolete_setter(_set_body, 'body'))
 
@@ -83,7 +89,7 @@ class Request(object_ref):
         return self._encoding
 
     def __str__(self):
-        return "<%s %s>" % (self.method, self.url)
+        return f"<{self.method} {self.url}>"
 
     __repr__ = __str__
 

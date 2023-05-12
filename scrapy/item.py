@@ -55,8 +55,7 @@ class DictItem(MutableMapping, BaseItem):
         if key in self.fields:
             self._values[key] = value
         else:
-            raise KeyError("%s does not support field: %s" %
-                (self.__class__.__name__, key))
+            raise KeyError(f"{self.__class__.__name__} does not support field: {key}")
 
     def __delitem__(self, key):
         del self._values[key]

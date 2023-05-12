@@ -57,8 +57,7 @@ class ItemLoader(object):
 
     def _add_value(self, field_name, value):
         value = arg_to_iter(value)
-        processed_value = self._process_input_value(field_name, value)
-        if processed_value:
+        if processed_value := self._process_input_value(field_name, value):
             self._values[field_name] += arg_to_iter(processed_value)
 
     def _replace_value(self, field_name, value):
@@ -66,8 +65,7 @@ class ItemLoader(object):
         self._add_value(field_name, value)
 
     def get_value(self, value, *processors, **kw):
-        regex = kw.get('re', None)
-        if regex:
+        if regex := kw.get('re', None):
             value = arg_to_iter(value)
             value = flatten([extract_regex(regex, x) for x in value])
 
@@ -99,17 +97,17 @@ class ItemLoader(object):
         return self._values[field_name]
 
     def get_input_processor(self, field_name):
-        proc = getattr(self, '%s_in' % field_name, None)
+        proc = getattr(self, f'{field_name}_in', None)
         if not proc:
             proc = self._get_item_field_attr(field_name, 'input_processor', \
-                self.default_input_processor)
+                    self.default_input_processor)
         return proc
 
     def get_output_processor(self, field_name):
-        proc = getattr(self, '%s_out' % field_name, None)
+        proc = getattr(self, f'{field_name}_out', None)
         if not proc:
             proc = self._get_item_field_attr(field_name, 'output_processor', \
-                self.default_output_processor)
+                    self.default_output_processor)
         return proc
 
     def _process_input_value(self, field_name, value):
@@ -118,11 +116,11 @@ class ItemLoader(object):
         return proc(value)
 
     def _get_item_field_attr(self, field_name, key, default=None):
-        if isinstance(self.item, Item):
-            value = self.item.fields[field_name].get(key, default)
-        else:
-            value = default
-        return value
+        return (
+            self.item.fields[field_name].get(key, default)
+            if isinstance(self.item, Item)
+            else default
+        )
 
     def _check_selector_method(self):
         if self.selector is None:

@@ -67,9 +67,7 @@ class RequestTest(unittest.TestCase):
         r2 = self.request_class(url=url)
         self.assertNotEqual(r1, r2)
 
-        set_ = set()
-        set_.add(r1)
-        set_.add(r2)
+        set_ = {r1, r2}
         self.assertEqual(len(set_), 2)
 
     def test_url(self):
@@ -228,8 +226,8 @@ class FormRequestTest(RequestTest):
         self.assertEqual(req.headers['Content-type'], 'application/x-www-form-urlencoded')
         self.assertEqual(req.url, "http://www.example.com/this/post.php")
         fs = _qs(req)
-        self.assertEqual(set(fs["test"]), set(["val1", "val2"]))
-        self.assertEqual(set(fs["one"]), set(["two", "three"]))
+        self.assertEqual(set(fs["test"]), {"val1", "val2"})
+        self.assertEqual(set(fs["one"]), {"two", "three"})
         self.assertEqual(fs['test2'], ['xxx'])
         self.assertEqual(fs['six'], ['seven'])
 
@@ -261,8 +259,8 @@ class FormRequestTest(RequestTest):
         self.assertEqual(urlparse(r1.url).hostname, "www.example.com")
         self.assertEqual(urlparse(r1.url).path, "/this/get.php")
         fs = _qs(r1)
-        self.assertEqual(set(fs['test']), set(['val1', 'val2']))
-        self.assertEqual(set(fs['one']), set(['two', 'three']))
+        self.assertEqual(set(fs['test']), {'val1', 'val2'})
+        self.assertEqual(set(fs['one']), {'two', 'three'})
         self.assertEqual(fs['test2'], ['xxx'])
         self.assertEqual(fs['six'], ['seven'])
 
@@ -650,7 +648,7 @@ class FormRequestTest(RequestTest):
             </form>''')
         req = self.request_class.from_response(res)
         fs = _qs(req)
-        self.assertEqual(set(fs), set(['h2', 'i2', 'i1', 'i3', 'h1', 'i5', 'i4']))
+        self.assertEqual(set(fs), {'h2', 'i2', 'i1', 'i3', 'h1', 'i5', 'i4'})
 
     def test_from_response_xpath(self):
         response = _buildresponse(
@@ -680,10 +678,7 @@ def _buildresponse(body, **kwargs):
     return HtmlResponse(**kwargs)
 
 def _qs(req):
-    if req.method == 'POST':
-        qs = req.body
-    else:
-        qs = req.url.partition('?')[2]
+    qs = req.body if req.method == 'POST' else req.url.partition('?')[2]
     return cgi.parse_qs(qs, True)
 
 

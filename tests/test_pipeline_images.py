@@ -17,7 +17,7 @@ try:
 except ImportError as e:
     skip = 'Missing Python Imaging Library, install https://pypi.python.org/pypi/Pillow'
 else:
-    encoders = set(('jpeg_encoder', 'jpeg_decoder'))
+    encoders = {'jpeg_encoder', 'jpeg_decoder'}
     if not encoders.issubset(set(Image.core.__dict__)):
         skip = 'Missing JPEG encoders'
 
@@ -101,11 +101,11 @@ class DeprecatedImagesPipeline(ImagesPipeline):
 
     def image_key(self, url):
         image_guid = hashlib.sha1(url).hexdigest()
-        return 'empty/%s.jpg' % (image_guid)
+        return f'empty/{image_guid}.jpg'
 
     def thumb_key(self, url, thumb_id):
         thumb_guid = hashlib.sha1(url).hexdigest()
-        return 'thumbsup/%s/%s.jpg' % (thumb_id, thumb_guid)
+        return f'thumbsup/{thumb_id}/{thumb_guid}.jpg'
 
 
 class DeprecatedImagesPipelineTestCase(unittest.TestCase):

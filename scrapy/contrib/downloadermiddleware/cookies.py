@@ -49,29 +49,27 @@ class CookiesMiddleware(object):
         return response
 
     def _debug_cookie(self, request, spider):
-        if self.debug:
-            cl = request.headers.getlist('Cookie')
-            if cl:
-                msg = "Sending cookies to: %s" % request + os.linesep
-                msg += os.linesep.join("Cookie: %s" % c for c in cl)
+        if cl := request.headers.getlist('Cookie'):
+            if self.debug:
+                msg = f"Sending cookies to: {request}{os.linesep}"
+                msg += os.linesep.join(f"Cookie: {c}" for c in cl)
                 log.msg(msg, spider=spider, level=log.DEBUG)
 
     def _debug_set_cookie(self, response, spider):
-        if self.debug:
-            cl = response.headers.getlist('Set-Cookie')
-            if cl:
-                msg = "Received cookies from: %s" % response + os.linesep
-                msg += os.linesep.join("Set-Cookie: %s" % c for c in cl)
+        if cl := response.headers.getlist('Set-Cookie'):
+            if self.debug:
+                msg = f"Received cookies from: {response}{os.linesep}"
+                msg += os.linesep.join(f"Set-Cookie: {c}" for c in cl)
                 log.msg(msg, spider=spider, level=log.DEBUG)
 
     def _format_cookie(self, cookie):
         # build cookie string
-        cookie_str = '%s=%s' % (cookie['name'], cookie['value'])
+        cookie_str = f"{cookie['name']}={cookie['value']}"
 
         if cookie.get('path', None):
-            cookie_str += '; Path=%s' % cookie['path']
+            cookie_str += f"; Path={cookie['path']}"
         if cookie.get('domain', None):
-            cookie_str += '; Domain=%s' % cookie['domain']
+            cookie_str += f"; Domain={cookie['domain']}"
 
         return cookie_str
 

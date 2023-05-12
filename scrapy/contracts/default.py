@@ -42,7 +42,7 @@ class ReturnsContract(Contract):
     def __init__(self, *args, **kwargs):
         super(ReturnsContract, self).__init__(*args, **kwargs)
 
-        assert len(self.args) in [1, 2, 3]
+        assert len(self.args) in {1, 2, 3}
         self.obj_name = self.args[0] or None
         self.obj_type = self.objects[self.obj_name]
 
@@ -57,21 +57,18 @@ class ReturnsContract(Contract):
             self.max_bound = float('inf')
 
     def post_process(self, output):
-        occurrences = 0
-        for x in output:
-            if isinstance(x, self.obj_type):
-                occurrences += 1
-
+        occurrences = sum(1 for x in output if isinstance(x, self.obj_type))
         assertion = (self.min_bound <= occurrences <= self.max_bound)
 
         if not assertion:
             if self.min_bound == self.max_bound:
                 expected = self.min_bound
             else:
-                expected = '%s..%s' % (self.min_bound, self.max_bound)
+                expected = f'{self.min_bound}..{self.max_bound}'
 
-            raise ContractFail("Returned %s %s, expected %s" % \
-                (occurrences, self.obj_name, expected))
+            raise ContractFail(
+                f"Returned {occurrences} {self.obj_name}, expected {expected}"
+            )
 
 
 class ScrapesContract(Contract):
@@ -85,5 +82,5 @@ class ScrapesContract(Contract):
         for x in output:
             if isinstance(x, BaseItem):
                 for arg in self.args:
-                    if not arg in x:
-                        raise ContractFail("'%s' field is missing" % arg)
+                    if arg not in x:
+                        raise ContractFail(f"'{arg}' field is missing")
