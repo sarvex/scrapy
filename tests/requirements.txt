@@ -1,5 +1,5 @@
 # Tests requirements
 mock
-mitmproxy==11.1.2
+mitmproxy==12.2.2
 netlib==0.10.1
 pytest-twisted
